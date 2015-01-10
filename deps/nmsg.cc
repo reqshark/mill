@@ -39,17 +39,17 @@ extern "C" {
 #include <nanomsg/pair.h>
 #include <nanomsg/reqrep.h>
 }
-//#include "nan.h"
+#include "nan.h"
 #include "templates.h"
 
 static void Init (Handle<Object> target) {
 
   //  Utility functions
-  target->Set(String::NewSymbol("sleep"),
-      FunctionTemplate::New(Sleep)->GetFunction());
+  //target->Set(String::NewSymbol("sleep"),
+      //FunctionTemplate::New(Sleep)->GetFunction());
 
-  target->Set(String::NewSymbol("usleep"),
-      FunctionTemplate::New(USleep)->GetFunction());
+  //target->Set(String::NewSymbol("usleep"),
+      //FunctionTemplate::New(USleep)->GetFunction());
 
   //  Socket functions
   target->Set(String::NewSymbol("socket"),
@@ -120,4 +120,4 @@ static void Init (Handle<Object> target) {
 }
 
 // Register the initialization function.
-NODE_MODULE(nanomsg, Init)
+NODE_MODULE(nmsg, Init)

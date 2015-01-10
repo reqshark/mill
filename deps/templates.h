@@ -7,50 +7,8 @@
 
 using namespace v8;
 
-Handle<Value> Sleep(const Arguments& args) {
-  HandleScope scope;
-
-  int seconds = args[0]->Uint32Value();
-  sleep(seconds);
-
-  return scope.Close( Local<Value>::New(Integer::New(seconds)) );
-}
-
-Handle<Value> USleep(const Arguments& args) {
-  HandleScope scope;
-
-  if(args.Length() != 1)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass a variable")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass a integer value")));
-    return scope.Close(Undefined());
-  }
-
-  int nanoseconds = args[0]->Uint32Value();
-  usleep(nanoseconds);
-
-  return scope.Close( Local<Value>::New(Integer::New(nanoseconds)) );
-}
-
 Handle<Value> Socket(const Arguments& args) {
   HandleScope scope;
-
-  if(args.Length() != 2)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass two variables")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber() || !args[1]->IsNumber())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass two integer values")));
-    return scope.Close(Undefined());
-  }
 
   int type = args[1]->Int32Value();
 
@@ -64,17 +22,14 @@ Handle<Value> Socket(const Arguments& args) {
 Handle<Value> Close(const Arguments& args) {
   HandleScope scope;
 
-  if(args.Length() != 1)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass one variable")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass [integer]")));
-    return scope.Close(Undefined());
-  }
+//  if(args.Length() != 1) {
+//    ThrowException(Exception::TypeError(String::New("Must pass one variable")));
+//    return scope.Close(Undefined());
+//  }
+//  if(!args[0]->IsNumber()) {
+//    ThrowException(Exception::TypeError(String::New("Must pass [integer]")));
+//    return scope.Close(Undefined());
+//  }
 
   int sp = args[1]->Int32Value();
 
@@ -85,19 +40,6 @@ Handle<Value> Close(const Arguments& args) {
 
 Handle<Value> SetSockOpt(const Arguments& args) {
   HandleScope scope;
-
-  if(args.Length() != 4)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass four variables")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber() || !args[1]->IsNumber() || !args[2]->IsNumber()
-    || !args[3]->IsNumber())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass [integer, integer, integer, integer]")));
-    return scope.Close(Undefined());
-  }
 
   int sock = args[0]->Int32Value();
   int level = args[1]->Int32Value();
@@ -111,18 +53,6 @@ Handle<Value> SetSockOpt(const Arguments& args) {
 
 Handle<Value> GetSockOpt(const Arguments& args) {
   HandleScope scope;
-
-  if(args.Length() != 3)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass three variables")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber() || !args[1]->IsNumber() || !args[2]->IsNumber())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass [integer, integer, integer]")));
-    return scope.Close(Undefined());
-  }
 
   int sock = args[0]->Int32Value();
   int level = args[1]->Int32Value();
@@ -139,18 +69,6 @@ Handle<Value> GetSockOpt(const Arguments& args) {
 Handle<Value> Bind(const Arguments& args) {
   HandleScope scope;
 
-  if(args.Length() != 2)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass two variables")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber() || !args[1]->IsString())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass [integer string]")));
-    return scope.Close(Undefined());
-  }
-
   String::Utf8Value address(args[1]);
 
   int ret = nn_bind(args[0]->Int32Value(), *address);
@@ -161,18 +79,6 @@ Handle<Value> Bind(const Arguments& args) {
 Handle<Value> Connect(const Arguments& args) {
   HandleScope scope;
 
-  if(args.Length() != 2)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass two variables")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber() || !args[1]->IsString())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass [integer string]")));
-    return scope.Close(Undefined());
-  }
-
   String::Utf8Value address(args[1]);
 
   int ret = nn_connect(args[0]->Int32Value(), *address);
@@ -182,18 +88,6 @@ Handle<Value> Connect(const Arguments& args) {
 
 Handle<Value> Send(const Arguments& args) {
   HandleScope scope;
-
-  if(args.Length() != 2)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass two variables")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber() || !args[1]->IsString())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass [integer string]")));
-    return scope.Close(Undefined());
-  }
 
   String::Utf8Value message(args[1]);
   unsigned char *buf = (unsigned char *)nn_allocmsg (message.length(), 0);
@@ -209,18 +103,6 @@ Handle<Value> Send(const Arguments& args) {
 
 Handle<Value> Recv(const Arguments& args) {
   HandleScope scope;
-
-  if(args.Length() != 1)
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass one variable")));
-    return scope.Close(Undefined());
-  }
-
-  if(!args[0]->IsNumber())
-  {
-    ThrowException(Exception::TypeError(String::New("Must pass [integer]")));
-    return scope.Close(Undefined());
-  }
 
   String::Utf8Value message(args[1]);
   unsigned char *buf;
