@@ -1,0 +1,37 @@
+{
+    "name": "nmsg",
+    "version": "0.0.1",
+    "description": "nanomsg utility for ios.js",
+    "dependencies": {
+      "bindings": "~1.2.1",
+      "nan": "~1.4.1"
+    },
+    "devDependencies":{
+      "mocha":  "~2.1.0",
+      "semver": "~4.1.1",
+      "should": "~4.3.1",
+      "after":  "~0.8.1"
+    },
+    "binary": {
+      "module_name" : "nmsg",
+      "module_path" : "deps/nmsg"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/reqshark/nmsg"
+    },
+    "bin": {
+      "nmsg": "./bin/nmsg"
+    },
+    "scripts": {
+      "travis-test": "make check"
+    },
+    "homepage": "https://msg.pub",
+    "keywords": ["nn","nanomsg","nanømsg","native","binding","addon"],
+    "author":{
+      "name":   "Bent Cardan",
+      "email":  "bent@nothingsatisfies.com",
+      "url":    "http://req.link"
+    },
+    "license": "beerware"
+}
