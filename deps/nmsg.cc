@@ -38,86 +38,59 @@ extern "C" {
 #include <nanomsg/bus.h>
 #include <nanomsg/pair.h>
 #include <nanomsg/reqrep.h>
+#include <nanomsg/survey.h>
 }
 #include "nan.h"
 #include "templates.h"
 
-static void Init (Handle<Object> target) {
-
-  //  Utility functions
-  //target->Set(String::NewSymbol("sleep"),
-      //FunctionTemplate::New(Sleep)->GetFunction());
-
-  //target->Set(String::NewSymbol("usleep"),
-      //FunctionTemplate::New(USleep)->GetFunction());
-
-  //  Socket functions
-  target->Set(String::NewSymbol("socket"),
-      FunctionTemplate::New(Socket)->GetFunction());
-
-  target->Set(String::NewSymbol("close"),
-      FunctionTemplate::New(Close)->GetFunction());
-
-  target->Set(String::NewSymbol("setsockopt"),
-      FunctionTemplate::New(SetSockOpt)->GetFunction());
-
-  target->Set(String::NewSymbol("getsockopt"),
-      FunctionTemplate::New(GetSockOpt)->GetFunction());
-
-  target->Set(String::NewSymbol("connect"),
-      FunctionTemplate::New(Connect)->GetFunction());
-
-  target->Set(String::NewSymbol("bind"),
-      FunctionTemplate::New(Bind)->GetFunction());
-
-  target->Set(String::NewSymbol("send"),
-      FunctionTemplate::New(Send)->GetFunction());
-
-  target->Set(String::NewSymbol("recv"),
-      FunctionTemplate::New(Recv)->GetFunction());
-
-  target->Set(String::NewSymbol("errno"),
-      FunctionTemplate::New(Errno)->GetFunction());
-
-  target->Set(String::NewSymbol("strerror"),
-      FunctionTemplate::New(StrErr)->GetFunction());
-
+void Init(Handle<Object> exports) {
+  exports->Set(NanNew("socket"), NanNew<FunctionTemplate>(Socket)->GetFunction());
+  //exports->Set(NanNew("close"), NanNew<FunctionTemplate>(Close)->GetFunction());
+//  exports->Set(NanNew("setsockopt"), NanNew<FunctionTemplate>(Delay)->GetFunction());
+//  exports->Set(NanNew("getsockopt"), NanNew<FunctionTemplate>(Delay)->GetFunction());
+//  exports->Set(NanNew("connect"), NanNew<FunctionTemplate>(Delay)->GetFunction());
+//  exports->Set(NanNew("bind"), NanNew<FunctionTemplate>(Delay)->GetFunction());
+//  exports->Set(NanNew("send"), NanNew<FunctionTemplate>(Delay)->GetFunction());
+//  exports->Set(NanNew("recv"), NanNew<FunctionTemplate>(Delay)->GetFunction());
+//  exports->Set(NanNew("errno"), NanNew<FunctionTemplate>(Delay)->GetFunction());
+//  exports->Set(NanNew("strerror"), NanNew<FunctionTemplate>(Delay)->GetFunction());
   //  SP address families.
-  NODE_DEFINE_CONSTANT(target, AF_SP);
-  NODE_DEFINE_CONSTANT(target, AF_SP_RAW);
+  NODE_DEFINE_CONSTANT(exports, AF_SP);
+  NODE_DEFINE_CONSTANT(exports, AF_SP_RAW);
 
   //  Socket option levels: Negative numbers are reserved for transports,
   //    positive for socket types.
-  NODE_DEFINE_CONSTANT(target, NN_SOL_SOCKET);
+  NODE_DEFINE_CONSTANT(exports, NN_SOL_SOCKET);
 
   //  Generic socket options (NN_SOL_SOCKET level).
-  NODE_DEFINE_CONSTANT(target, NN_LINGER);
-  NODE_DEFINE_CONSTANT(target, NN_SNDBUF);
-  NODE_DEFINE_CONSTANT(target, NN_RCVBUF);
-  NODE_DEFINE_CONSTANT(target, NN_SNDTIMEO);
-  NODE_DEFINE_CONSTANT(target, NN_RCVTIMEO);
-  NODE_DEFINE_CONSTANT(target, NN_RECONNECT_IVL);
-  NODE_DEFINE_CONSTANT(target, NN_RECONNECT_IVL_MAX);
-  NODE_DEFINE_CONSTANT(target, NN_SNDPRIO);
-  NODE_DEFINE_CONSTANT(target, NN_SNDFD);
-  NODE_DEFINE_CONSTANT(target, NN_RCVFD);
-  NODE_DEFINE_CONSTANT(target, NN_DOMAIN);
-  NODE_DEFINE_CONSTANT(target, NN_PROTOCOL);
-  NODE_DEFINE_CONSTANT(target, NN_IPV4ONLY);
+  NODE_DEFINE_CONSTANT(exports, NN_LINGER);
+  NODE_DEFINE_CONSTANT(exports, NN_SNDBUF);
+  NODE_DEFINE_CONSTANT(exports, NN_RCVBUF);
+  NODE_DEFINE_CONSTANT(exports, NN_SNDTIMEO);
+  NODE_DEFINE_CONSTANT(exports, NN_RCVTIMEO);
+  NODE_DEFINE_CONSTANT(exports, NN_RECONNECT_IVL);
+  NODE_DEFINE_CONSTANT(exports, NN_RECONNECT_IVL_MAX);
+  NODE_DEFINE_CONSTANT(exports, NN_SNDPRIO);
+  NODE_DEFINE_CONSTANT(exports, NN_SNDFD);
+  NODE_DEFINE_CONSTANT(exports, NN_RCVFD);
+  NODE_DEFINE_CONSTANT(exports, NN_DOMAIN);
+  NODE_DEFINE_CONSTANT(exports, NN_PROTOCOL);
+  NODE_DEFINE_CONSTANT(exports, NN_IPV4ONLY);
 
   //  Send/recv options.
-  NODE_DEFINE_CONSTANT(target, NN_DONTWAIT);
+  NODE_DEFINE_CONSTANT(exports, NN_DONTWAIT);
 
   //  Socket types
-  NODE_DEFINE_CONSTANT(target, NN_REQ);
-  NODE_DEFINE_CONSTANT(target, NN_REP);
-  NODE_DEFINE_CONSTANT(target, NN_PAIR);
-  NODE_DEFINE_CONSTANT(target, NN_PUSH);
-  NODE_DEFINE_CONSTANT(target, NN_PULL);
-  NODE_DEFINE_CONSTANT(target, NN_PUB);
-  NODE_DEFINE_CONSTANT(target, NN_SUB);
-  NODE_DEFINE_CONSTANT(target, NN_BUS);
+  NODE_DEFINE_CONSTANT(exports, NN_SURVEYOR);
+  NODE_DEFINE_CONSTANT(exports, NN_RESPONDENT);
+  NODE_DEFINE_CONSTANT(exports, NN_REQ);
+  NODE_DEFINE_CONSTANT(exports, NN_REP);
+  NODE_DEFINE_CONSTANT(exports, NN_PAIR);
+  NODE_DEFINE_CONSTANT(exports, NN_PUSH);
+  NODE_DEFINE_CONSTANT(exports, NN_PULL);
+  NODE_DEFINE_CONSTANT(exports, NN_PUB);
+  NODE_DEFINE_CONSTANT(exports, NN_SUB);
+  NODE_DEFINE_CONSTANT(exports, NN_BUS);
 }
 
-// Register the initialization function.
 NODE_MODULE(nmsg, Init)

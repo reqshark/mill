@@ -1,6 +1,6 @@
 {
     "name": "nmsg",
-    "version": "0.0.3",
+    "version": "0.0.5",
     "description": "nanomsg utility for ios.js",
     "dependencies": {
       "bindings": "~1.2.1",
@@ -26,8 +26,8 @@
     "scripts": {
       "travis-test": "make check"
     },
-    "homepage": "https://msg.pub",
-    "keywords": ["nn","nanomsg","nanømsg","native","binding","addon"],
+    "homepage": "http://msg.pub",
+    "keywords": ["nanomsg","native","binding","addon","nn","nanømsg"],
     "author":{
       "name":   "Bent Cardan",
       "email":  "bent@nothingsatisfies.com",
