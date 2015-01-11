@@ -17,9 +17,15 @@ describe('socket.open', function() {
 
     var fam = nmsg.AF_SP, i=0
 
-    while(i<=types){
+    while(i<=types.length){
       var socket = nmsg.socket( fam, nmsg[types[i]] )
-      socket.should.equal(0)
+      setTimeout(function(){
+
+        socket.should.equal(0)
+
+      },100)
+
+      i++
     }
 
     done()
