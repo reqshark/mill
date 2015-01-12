@@ -4,7 +4,7 @@ var semver = require('semver')
 
 describe('socket.open', function() {
 
-  it('should open all socket types', function (done) {
+  it('should open and all AF_SP family socket types', function (done) {
 
     var types = [
       'NN_PUB', 'NN_SUB',
@@ -18,7 +18,9 @@ describe('socket.open', function() {
     var fam = nmsg.AF_SP, i=0
 
     while(i<=types.length){
+
       var socket = nmsg.socket( fam, nmsg[types[i]] )
+
       setTimeout(function(){
 
         socket.should.equal(0)
@@ -31,4 +33,5 @@ describe('socket.open', function() {
     done()
 
   })
+
 })

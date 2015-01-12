@@ -31,6 +31,7 @@
 #include <uv.h>
 #include <v8.h>
 
+//cs50.harvard.edu/resources/cppreference.com/preprocessor/index.html
 extern "C" {
 #include <nanomsg/nn.h>
 #include <nanomsg/pubsub.h>
@@ -46,14 +47,16 @@ extern "C" {
 void Init(Handle<Object> exports) {
   exports->Set(NanNew("socket"), NanNew<FunctionTemplate>(Socket)->GetFunction());
   //exports->Set(NanNew("close"), NanNew<FunctionTemplate>(Close)->GetFunction());
-//  exports->Set(NanNew("setsockopt"), NanNew<FunctionTemplate>(Delay)->GetFunction());
-//  exports->Set(NanNew("getsockopt"), NanNew<FunctionTemplate>(Delay)->GetFunction());
-//  exports->Set(NanNew("connect"), NanNew<FunctionTemplate>(Delay)->GetFunction());
-//  exports->Set(NanNew("bind"), NanNew<FunctionTemplate>(Delay)->GetFunction());
-//  exports->Set(NanNew("send"), NanNew<FunctionTemplate>(Delay)->GetFunction());
-//  exports->Set(NanNew("recv"), NanNew<FunctionTemplate>(Delay)->GetFunction());
-//  exports->Set(NanNew("errno"), NanNew<FunctionTemplate>(Delay)->GetFunction());
-//  exports->Set(NanNew("strerror"), NanNew<FunctionTemplate>(Delay)->GetFunction());
+//  exports->Set(NanNew("setsockopt"), NanNew<FunctionTemplate>(Setsockopt)->GetFunction());
+//  exports->Set(NanNew("getsockopt"), NanNew<FunctionTemplate>(Getsockopt)->GetFunction());
+//  exports->Set(NanNew("connect"), NanNew<FunctionTemplate>(Connect)->GetFunction());
+//  exports->Set(NanNew("bind"), NanNew<FunctionTemplate>(Bind)->GetFunction());
+//  exports->Set(NanNew("send"), NanNew<FunctionTemplate>(Send)->GetFunction());
+//  exports->Set(NanNew("recv"), NanNew<FunctionTemplate>(Recv)->GetFunction());
+//  exports->Set(NanNew("msgrecv"), NanNew<FunctionTemplate>(Send)->GetFunction());
+//  exports->Set(NanNew("sendrecv"), NanNew<FunctionTemplate>(Recv)->GetFunction());
+//  exports->Set(NanNew("errno"), NanNew<FunctionTemplate>(Errno)->GetFunction());
+//  exports->Set(NanNew("strerror"), NanNew<FunctionTemplate>(Strerror)->GetFunction());
   //  SP address families.
   NODE_DEFINE_CONSTANT(exports, AF_SP);
   NODE_DEFINE_CONSTANT(exports, AF_SP_RAW);

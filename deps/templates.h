@@ -1,3 +1,5 @@
+
+//cs50.harvard.edu/resources/cppreference.com/stdstring/index.html
 using namespace v8;
 
 NAN_METHOD(Socket) {
@@ -11,11 +13,13 @@ NAN_METHOD(Socket) {
   NanReturnValue(NanNew<Number>(ret));
 }
 
-//NAN_METHOD(Close){
-//  NanScope();
-//  int64_t ret = nn_close(args[0]).As<Number>()->IntegerValue();
-//  NanReturnValue(NanNew<Number>(ret));
-//}
+NAN_METHOD(Close){
+  NanScope();
+
+  int64_t s = args[0].As<Number>()->IntegerValue();
+  int ret = nn_close(s);
+  NanReturnValue(NanNew<Number>(ret));
+}
 
 //Handle<Value> Close(const Arguments& args) {
   //HandleScope scope;
