@@ -44,19 +44,17 @@ extern "C" {
 #include "nan.h"
 #include "templates.h"
 
+#define EXPORT_METHOD(C, S) C->Set(NanNew(# S), NanNew<FunctionTemplate>(S)->GetFunction());
+//#define EXPORT_CONSTANT(C, S) C->Set(NanNew(# S), NanNew<Number>(S));
+
 void Init(Handle<Object> exports) {
-  exports->Set(NanNew("socket"), NanNew<FunctionTemplate>(Socket)->GetFunction());
-  //exports->Set(NanNew("close"), NanNew<FunctionTemplate>(Close)->GetFunction());
-//  exports->Set(NanNew("setsockopt"), NanNew<FunctionTemplate>(Setsockopt)->GetFunction());
-//  exports->Set(NanNew("getsockopt"), NanNew<FunctionTemplate>(Getsockopt)->GetFunction());
-//  exports->Set(NanNew("connect"), NanNew<FunctionTemplate>(Connect)->GetFunction());
-//  exports->Set(NanNew("bind"), NanNew<FunctionTemplate>(Bind)->GetFunction());
-//  exports->Set(NanNew("send"), NanNew<FunctionTemplate>(Send)->GetFunction());
-//  exports->Set(NanNew("recv"), NanNew<FunctionTemplate>(Recv)->GetFunction());
-//  exports->Set(NanNew("msgrecv"), NanNew<FunctionTemplate>(Send)->GetFunction());
-//  exports->Set(NanNew("sendrecv"), NanNew<FunctionTemplate>(Recv)->GetFunction());
-//  exports->Set(NanNew("errno"), NanNew<FunctionTemplate>(Errno)->GetFunction());
-//  exports->Set(NanNew("strerror"), NanNew<FunctionTemplate>(Strerror)->GetFunction());
+  NanScope();
+  EXPORT_METHOD(exports, Socket);
+  EXPORT_METHOD(exports, Close);
+  EXPORT_METHOD(exports, Connect);
+  EXPORT_METHOD(exports, Bind);
+  EXPORT_METHOD(exports, Send);
+  EXPORT_METHOD(exports, Recv);
   //  SP address families.
   NODE_DEFINE_CONSTANT(exports, AF_SP);
   NODE_DEFINE_CONSTANT(exports, AF_SP_RAW);

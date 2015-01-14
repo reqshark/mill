@@ -1,15 +1,21 @@
 
 //cs50.harvard.edu/resources/cppreference.com/stdstring/index.html
-using namespace v8;
+using v8::Array;
+using v8::Function;
+using v8::FunctionTemplate;
+using v8::Handle;
+using v8::Local;
+using v8::Number;
+using v8::Object;
+using v8::String;
+using v8::Value;
 
 NAN_METHOD(Socket) {
   NanScope();
-
   int64_t type = args[1].As<Number>()->IntegerValue();
   int ret = nn_socket(args[0].As<Number>()->IntegerValue(), type);
   if(type == NN_SUB)
     nn_setsockopt (ret, NN_SUB, NN_SUB_SUBSCRIBE, "", 0);
-
   NanReturnValue(NanNew<Number>(ret));
 }
 
@@ -21,24 +27,37 @@ NAN_METHOD(Close){
   NanReturnValue(NanNew<Number>(ret));
 }
 
-//Handle<Value> Close(const Arguments& args) {
-  //HandleScope scope;
+NAN_METHOD(Bind) {
+  NanScope();
+  int64_t s = args[0].As<Number>()->IntegerValue();
+  String::Utf8Value addr(args[1]);
+  NanReturnValue(NanNew<Number>(nn_bind(s, *addr)));
+}
 
-//  if(args.Length() != 1) {
-//    ThrowException(Exception::TypeError(String::New("Must pass one variable")));
-//    return scope.Close(Undefined());
-//  }
-//  if(!args[0]->IsNumber()) {
-//    ThrowException(Exception::TypeError(String::New("Must pass [integer]")));
-//    return scope.Close(Undefined());
-//  }
+NAN_METHOD(Connect) {
+  NanScope();
+  int64_t s = args[0].As<Number>()->IntegerValue();
+  String::Utf8Value addr(args[1]);
+  NanReturnValue(NanNew<Number>(nn_connect(s, *addr)));
+}
 
-  //int sp = args[1]->Int32Value();
+NAN_METHOD(Send) {
+  NanScope();
+  Local<Object> obj = args[1]->ToObject();
+  nn_send (args[0].As<Number>()->IntegerValue(), node::Buffer::Data(obj),
+    node::Buffer::Length(obj), args[2].As<Number>()->IntegerValue());
+  NanReturnUndefined();
+}
 
-  //int ret = nn_close(sp);
+NAN_METHOD(Recv) {
+  NanScope();
+  char* buf = NULL;
+  nn_recv (args[0].As<Number>()->IntegerValue(),
+    &buf, NN_MSG, args[1].As<Number>()->IntegerValue());
+  nn_freemsg (buf);
+  NanReturnValue(NanNew<String>(buf));
+}
 
-  //return scope.Close( Local<Value>::New(Integer::New(ret)) );
-//}
 
 //Handle<Value> SetSockOpt(const Arguments& args) {
   //HandleScope scope;
