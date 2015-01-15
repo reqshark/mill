@@ -1,15 +1,4 @@
 
-//cs50.harvard.edu/resources/cppreference.com/stdstring/index.html
-using v8::Array;
-using v8::Function;
-using v8::FunctionTemplate;
-using v8::Handle;
-using v8::Local;
-using v8::Number;
-using v8::Object;
-using v8::String;
-using v8::Value;
-
 NAN_METHOD(Socket) {
   NanScope();
   int64_t type = args[1].As<Number>()->IntegerValue();

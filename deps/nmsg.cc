@@ -25,11 +25,6 @@
  * For more information, please refer to <http://www.wtfpl.net/>
  */
 
-#include "node.h"
-#include "node_buffer.h"
-#include "nan.h"
-
-//cs50.harvard.edu/resources/cppreference.com/preprocessor/index.html
 extern "C" {
   #include <nanomsg/nn.h>
   #include <nanomsg/pubsub.h>
@@ -40,10 +35,22 @@ extern "C" {
   #include <nanomsg/survey.h>
 }
 
-#include "templates.h"
-
+#include "node.h"
+#include "node_buffer.h"
+#include "nan.h"
 #define EXPORT_METHOD(C, S) C->Set(NanNew(# S), NanNew<FunctionTemplate>(S)->GetFunction());
-//#define EXPORT_CONSTANT(C, S) C->Set(NanNew(# S), NanNew<Number>(S));
+
+using v8::Array;
+using v8::Function;
+using v8::FunctionTemplate;
+using v8::Handle;
+using v8::Local;
+using v8::Number;
+using v8::Object;
+using v8::String;
+using v8::Value;
+
+#include "templates.h"
 
 void Init(Handle<Object> exports) {
   NanScope();
@@ -53,15 +60,19 @@ void Init(Handle<Object> exports) {
   EXPORT_METHOD(exports, Bind);
   EXPORT_METHOD(exports, Send);
   EXPORT_METHOD(exports, Recv);
-  //  SP address families.
+  NODE_DEFINE_CONSTANT(exports, NN_SURVEYOR);
+  NODE_DEFINE_CONSTANT(exports, NN_RESPONDENT);
+  NODE_DEFINE_CONSTANT(exports, NN_REQ);
+  NODE_DEFINE_CONSTANT(exports, NN_REP);
+  NODE_DEFINE_CONSTANT(exports, NN_PAIR);
+  NODE_DEFINE_CONSTANT(exports, NN_PUSH);
+  NODE_DEFINE_CONSTANT(exports, NN_PULL);
+  NODE_DEFINE_CONSTANT(exports, NN_PUB);
+  NODE_DEFINE_CONSTANT(exports, NN_SUB);
+  NODE_DEFINE_CONSTANT(exports, NN_BUS);
   NODE_DEFINE_CONSTANT(exports, AF_SP);
   NODE_DEFINE_CONSTANT(exports, AF_SP_RAW);
-
-  //  Socket option levels: Negative numbers are reserved for transports,
-  //    positive for socket types.
   NODE_DEFINE_CONSTANT(exports, NN_SOL_SOCKET);
-
-  //  Generic socket options (NN_SOL_SOCKET level).
   NODE_DEFINE_CONSTANT(exports, NN_LINGER);
   NODE_DEFINE_CONSTANT(exports, NN_SNDBUF);
   NODE_DEFINE_CONSTANT(exports, NN_RCVBUF);
@@ -75,21 +86,7 @@ void Init(Handle<Object> exports) {
   NODE_DEFINE_CONSTANT(exports, NN_DOMAIN);
   NODE_DEFINE_CONSTANT(exports, NN_PROTOCOL);
   NODE_DEFINE_CONSTANT(exports, NN_IPV4ONLY);
-
-  //  Send/recv options.
   NODE_DEFINE_CONSTANT(exports, NN_DONTWAIT);
-
-  //  Socket types
-  NODE_DEFINE_CONSTANT(exports, NN_SURVEYOR);
-  NODE_DEFINE_CONSTANT(exports, NN_RESPONDENT);
-  NODE_DEFINE_CONSTANT(exports, NN_REQ);
-  NODE_DEFINE_CONSTANT(exports, NN_REP);
-  NODE_DEFINE_CONSTANT(exports, NN_PAIR);
-  NODE_DEFINE_CONSTANT(exports, NN_PUSH);
-  NODE_DEFINE_CONSTANT(exports, NN_PULL);
-  NODE_DEFINE_CONSTANT(exports, NN_PUB);
-  NODE_DEFINE_CONSTANT(exports, NN_SUB);
-  NODE_DEFINE_CONSTANT(exports, NN_BUS);
 }
 
 NODE_MODULE(nmsg, Init)
