@@ -10,19 +10,22 @@ env:
 #  - NANOMSG="git://github.com/nanomsg/nanomsg.git -b 0.5-beta"
 #  - NANOMSG="git://github.com/nanomsg/nanomsg.git"
 before_install:
-  - npm install npm
-  - mv node_modules npm
-  - npm/.bin/npm --version
-  - npm/.bin/npm install
-  - rm -rf ~/.nvm
-  - git clone https://github.com/creationix/nvm.git ~/.nvm
-  - source ~/.nvm/nvm.sh
-  - nvm install $NODE_VERSION
-  - node --version
-  - node_modules/.bin/node-gyp rebuild --directory test
-  - git clone --depth 1 git://github.com/nanomsg/nanomsg.git nanomsg
-  - cd nanomsg && ./autogen.sh && ./configure && make
-  - sudo make install
-  - sudo /sbin/ldconfig
-  - cd ..
-language: node_js
+  - brew install node
+  - which node
+  - ls -la
+#  - npm install npm
+#  - mv node_modules npm
+#  - npm/.bin/npm --version
+#  - npm/.bin/npm install
+#  - rm -rf ~/.nvm
+#  - git clone https://github.com/creationix/nvm.git ~/.nvm
+#  - source ~/.nvm/nvm.sh
+#  - nvm install $NODE_VERSION
+#  - node --version
+#  - node_modules/.bin/node-gyp rebuild --directory test
+#  - git clone --depth 1 git://github.com/nanomsg/nanomsg.git nanomsg
+#  - cd nanomsg && ./autogen.sh && ./configure && make
+#  - sudo make install
+#  - sudo /sbin/ldconfig
+#  - cd ..
+language: c
