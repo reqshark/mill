@@ -25,23 +25,21 @@
  * For more information, please refer to <http://www.wtfpl.net/>
  */
 
-#include <node.h>
-#include <node_version.h>
-#include <node_buffer.h>
-#include <uv.h>
-#include <v8.h>
+#include "node.h"
+#include "node_buffer.h"
+#include "nan.h"
 
 //cs50.harvard.edu/resources/cppreference.com/preprocessor/index.html
 extern "C" {
-#include <nanomsg/nn.h>
-#include <nanomsg/pubsub.h>
-#include <nanomsg/pipeline.h>
-#include <nanomsg/bus.h>
-#include <nanomsg/pair.h>
-#include <nanomsg/reqrep.h>
-#include <nanomsg/survey.h>
+  #include <nanomsg/nn.h>
+  #include <nanomsg/pubsub.h>
+  #include <nanomsg/pipeline.h>
+  #include <nanomsg/bus.h>
+  #include <nanomsg/pair.h>
+  #include <nanomsg/reqrep.h>
+  #include <nanomsg/survey.h>
 }
-#include "nan.h"
+
 #include "templates.h"
 
 #define EXPORT_METHOD(C, S) C->Set(NanNew(# S), NanNew<FunctionTemplate>(S)->GetFunction());
