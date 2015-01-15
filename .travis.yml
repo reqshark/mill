@@ -1,3 +1,6 @@
+os:
+  - linux
+  - osx
 env:
   - NANOMSG="git://github.com/nanomsg/nanomsg.git -b 0.3-beta"
   - NANOMSG="git://github.com/nanomsg/nanomsg.git -b 0.4-beta"
@@ -6,7 +9,9 @@ env:
 before_install:
   - git clone --depth 1 $NANOMSG nanomsg
   - cd nanomsg && ./autogen.sh && ./configure && make
-  - sudo make install && sudo /sbin/ldconfig && cd ..
+  - sudo make install
+  - sudo /sbin/ldconfig
+  - cd ..
 language: node_js
 node_js:
   - "0.8"
