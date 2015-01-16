@@ -33,6 +33,7 @@ extern "C" {
   #include <nanomsg/pair.h>
   #include <nanomsg/reqrep.h>
   #include <nanomsg/survey.h>
+  #include <nanomsg/tcp.h>
 }
 
 #include "node.h"
