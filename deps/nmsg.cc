@@ -41,7 +41,13 @@ extern "C" {
 #include "nan.h"
 #define EXPORT_METHOD(C, S) C->Set(NanNew(# S), NanNew<FunctionTemplate>(S)->GetFunction());
 
-using v8::Array;
+#if (NODE_MODULE_VERSION < 10)
+#define RUNLOOP_SEMANTICS ev_run(ev_default_loop(), EVRUN_ONCE)
+#else
+#define RUNLOOP_SEMANTICS uv_run(uv_default_loop(), UV_RUN_ONCE)
+#endif
+
+//using v8::Array;
 using v8::Function;
 using v8::FunctionTemplate;
 using v8::Handle;
@@ -61,6 +67,9 @@ void Init(Handle<Object> exports) {
   EXPORT_METHOD(exports, Bind);
   EXPORT_METHOD(exports, Send);
   EXPORT_METHOD(exports, Recv);
+  EXPORT_METHOD(exports, Stall);
+  NODE_DEFINE_CONSTANT(exports, AF_SP);
+  NODE_DEFINE_CONSTANT(exports, AF_SP_RAW);
   NODE_DEFINE_CONSTANT(exports, NN_SURVEYOR);
   NODE_DEFINE_CONSTANT(exports, NN_RESPONDENT);
   NODE_DEFINE_CONSTANT(exports, NN_REQ);
@@ -71,8 +80,6 @@ void Init(Handle<Object> exports) {
   NODE_DEFINE_CONSTANT(exports, NN_PUB);
   NODE_DEFINE_CONSTANT(exports, NN_SUB);
   NODE_DEFINE_CONSTANT(exports, NN_BUS);
-  NODE_DEFINE_CONSTANT(exports, AF_SP);
-  NODE_DEFINE_CONSTANT(exports, AF_SP_RAW);
   NODE_DEFINE_CONSTANT(exports, NN_SOL_SOCKET);
   NODE_DEFINE_CONSTANT(exports, NN_LINGER);
   NODE_DEFINE_CONSTANT(exports, NN_SNDBUF);
