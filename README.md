@@ -22,8 +22,8 @@ setTimeout(function(){
 ```
 
 # test
-on node v0.8 and up
-
+[![philosophy](benchmark/ff.png)](http://en.wikipedia.org/wiki/Unix_philosophy#.22Worse_is_better.22)
 ```bash
 $ make clean && make && make check
 ```
+<sub>*binding node v0.8 and up*</sub>
