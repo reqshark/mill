@@ -2,7 +2,7 @@
 
 use the [official binding](https://github.com/nickdesaulniers/node-nanomsg) or the new [iojs-nanomsg](https://www.npmjs.com/package/iojs-nanomsg) package i'm working on. 
 
-all of the code here was just my starting point and then around January 19th I ported this code over to the [iojs-nanomsg project](https://github.com/reqshark/nanomsg.iojs), from there I added node streams and a lot of general improvements to how the binding handles buffer objects getting coverted back and forth between node and the c library. 
+all of the code here was just my starting point. false: my true starting point was learning from Fatih Kaya's code, [i forked his nanomsg binding experiments](https://github.com/reqshark/nanomsg.node) and.. well anyway at some point during January 19th, 2015 I ported all the code in this repo over to the [iojs-nanomsg project](https://github.com/reqshark/nanomsg.iojs), from there I added node streams and a lot of general improvements to how the binding handles buffer objects getting coverted back and forth between node and the c library. 
 
 anyway i'm building out more of that stuff right now on github here: https://github.com/reqshark/nanomsg.iojs also if you have any ideas please submit PRs and Fork it or submit issues there, thanks. -reqshark
 
