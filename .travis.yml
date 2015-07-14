@@ -1,10 +1,15 @@
+language: c
+
+sudo: false
+
 os:
-  - osx
+#  - osx
   - linux
+
 env:
-  - NODE_V="0.8"
   - NODE_V="0.10"
-  - NODE_V="0.11"
+  - NODE_V="0.12"
+  - NODE_V="iojs"
 before_install:
   - echo -e "echo nothing to configure" >> configure && chmod a+x configure
   - rm -rf ~/.nvm
@@ -13,9 +18,19 @@ before_install:
   - nvm install $NODE_V && node --version
   - echo -e "require('fs').writeFile('platform.sh','export PLATFORM=\"'+require('os').platform()+'\"')" >> "check.js"
   - node check.js && chmod a+x platform.sh && source platform.sh
-  - git clone --depth 1 git://github.com/nanomsg/nanomsg.git nanomsg
-  - cd nanomsg && ./autogen.sh && ./configure && make
-  - sudo make install
-  - '[ "$PLATFORM" == "darwin" ] || sudo /sbin/ldconfig'
+  - export MILLPATH=`pwd`/deps
+install:
+  - git clone --depth 1 git://github.com/sustrik/libmill.git mill
+  - cd mill
+  - ./autogen.sh
+  - ./configure --prefix=$MILLPATH
+  - make
+  - make install
   - cd ..
-language: c
+
+script:
+  - make
+  - make check
+
+notifications:
+  email: false

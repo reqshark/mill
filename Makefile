@@ -1,18 +1,13 @@
-TESTS = $(wildcard test/test.*.js)
-MOCHA = node_modules/.bin/mocha
-RUN = $(MOCHA) --expose-gc --slow 2000 --timeout 600000
+.PHONY: clean check test
 
 ALL:
 	npm i
 
 check:
-	$(RUN)
+	npm test
 
 test:
-	$(RUN)
+	npm t
 
 clean:
-	rm -fr build
-	rm -rf node_modules
-
-.PHONY: clean check test
+	rm -fr build && rm -rf node_modules
