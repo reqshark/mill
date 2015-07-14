@@ -1,17 +1,20 @@
 #include "nan.h"
 #include <stdio.h>
+#include <iostream>
 
-extern "C" {
+//extern "C" {
 #include "patch.h"
+//}
+
+void worker(int count, const char *text) {
+    int i;
+    for(i = 0; i != count; ++i) {
+        printf("%s\n", text);
+        msleep(10);
+    }
 }
 
-//void worker(int count, const char *text) {
-//    int i;
-//    for(i = 0; i != count; ++i) {
-//        printf("%s\n", text);
-//        msleep(10);
-//    }
-//}
+using namespace std;
 
 #if (NODE_MODULE_VERSION < 10)
 #define RUNLOOP_SEMANTICS ev_run(ev_default_loop(), EVRUN_ONCE)
@@ -31,10 +34,22 @@ NAN_METHOD(stall) {
   NanReturnUndefined();
 }
 
+NAN_METHOD(test){
+  NanScope();
+  cout << "start test";
+  go(worker(4, "a"));
+  go(worker(2, "b"));
+  go(worker(3, "c"));
+  msleep(100);
+  cout << "end test";
+  NanReturnUndefined();
+}
+
 
 void Init(Handle<Object> exports) {
   NanScope();
   EXPORT_METHOD(exports, stall);
+  EXPORT_METHOD(exports, test);
 }
 
-NODE_MODULE(stall, Init)
+NODE_MODULE(mill, Init)

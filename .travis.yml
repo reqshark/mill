@@ -1,6 +1,6 @@
-language: c
-
 sudo: false
+
+language: c
 
 os:
   - osx

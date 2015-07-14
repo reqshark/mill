@@ -240,16 +240,16 @@ MILL_EXPORT void *mill_choose_val(void);
 /*  TCP library                                                               */
 /******************************************************************************/
 
-typedef struct tcpsock *tcpsock;
+//typedef struct tcpsock *tcpsock;
 
-MILL_EXPORT tcpsock tcplisten(const char *addr);
-MILL_EXPORT tcpsock tcpaccept(tcpsock s);
-MILL_EXPORT tcpsock tcpconnect(const char *addr);
-MILL_EXPORT void tcpsend(tcpsock s, const void *buf, size_t len);
-MILL_EXPORT int tcpflush(tcpsock s);
-MILL_EXPORT ssize_t tcprecv(tcpsock s, void *buf, size_t len);
-MILL_EXPORT ssize_t tcprecvuntil(tcpsock s, void *buf, size_t len, char until);
-MILL_EXPORT void tcpclose(tcpsock s);
+//MILL_EXPORT tcpsock tcplisten(const char *addr);
+//MILL_EXPORT tcpsock tcpaccept(tcpsock s);
+//MILL_EXPORT tcpsock tcpconnect(const char *addr);
+//MILL_EXPORT void tcpsend(tcpsock s, const void *buf, size_t len);
+//MILL_EXPORT int tcpflush(tcpsock s);
+//MILL_EXPORT ssize_t tcprecv(tcpsock s, void *buf, size_t len);
+//MILL_EXPORT ssize_t tcprecvuntil(tcpsock s, void *buf, size_t len, char until);
+//MILL_EXPORT void tcpclose(tcpsock s);
 
 /******************************************************************************/
 /*  Debugging                                                                 */

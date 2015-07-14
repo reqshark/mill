@@ -4,14 +4,17 @@
  * calling done() resumes contextual program flow back to normal asyc javascript
  */
 var binding = require('bindings')('mill.node')
+
 module.exports = {
-  wait:function wait(fn) {
-      return function () {
-        var done=false, err, res;
-        fn.apply(this, Array.prototype.slice.apply(arguments).concat(cb))
-        while (!done) binding.stall(); if(err)throw err; return res
-        function cb (e, r) { err=e; res=r; done=true }
-      }
-    },
-//  start: binding.start
+  wait  :   wait,
+  test  :   binding.test
+}
+
+function wait(fn) {
+  return function () {
+    var done=false, err, res;
+    fn.apply(this, Array.prototype.slice.apply(arguments).concat(cb))
+    while (!done) binding.stall(); if(err)throw err; return res
+    function cb (e, r) { err=e; res=r; done=true }
+  }
 }

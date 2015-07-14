@@ -1,6 +1,7 @@
 .PHONY: clean check test
 
 ALL:
+	git submodule update --init
 	npm i
 
 check:
