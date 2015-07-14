@@ -1,13 +1,12 @@
 {
     # compiler settings to build libmill
-    'defines': [
-        '__clang__'
-    ],
+#    'defines': [
+#        '__clang__','__llvm__'
+#    ],
     'xcode_settings': {
         'MACOSX_DEPLOYMENT_TARGET': '10.7',
         'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
         'OTHER_CFLAGS': [
-            '',
             '-g',
             '-std=c99',
             '-stdlib=libc',

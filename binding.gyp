@@ -4,9 +4,6 @@
       'target_name' : 'mill',
 #      'type': 'static_library',
       'cflags': [ '-DMILL_EXPORTS', '-U_FORTIFY_SOURCE', '-D_FORTIFY_SOURCE=0', '-g', '-O0' ],
-      'defines': [
-        '_mill_unoptimisable1'
-      ],
       'conditions': [
         ['OS=="mac"', {
             'includes': ['osx.gypi']

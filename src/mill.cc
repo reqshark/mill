@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <iostream>
 
-//extern "C" {
+extern "C" {
 #include "patch.h"
-//}
+}
 
 void worker(int count, const char *text) {
     int i;
