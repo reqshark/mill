@@ -7,8 +7,8 @@ os:
   - linux
 
 env:
-  - NODE_V="0.10"
-  - NODE_V="0.12"
+#  - NODE_V="0.10"
+#  - NODE_V="0.12"
   - NODE_V="iojs"
 before_install:
   - echo -e "echo nothing to configure" >> configure && chmod a+x configure

@@ -1,0 +1,28 @@
+{
+    "name": "libmill",
+    "version": "0.0.1",
+    "description": "bindings to libmill",
+    "dependencies": {
+      "bindings": "~1.2.1",
+      "nan": "~1.8.4"
+    },
+    "devDependencies":{
+      "tape":         "~3.5.0",
+      "tap-spec":     "~2.2.1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/reqshark/mill"
+    },
+    "scripts": {
+      "test":         "node test | tap-spec"
+    },
+    "homepage": "http://msg.pub",
+    "keywords": ["native","binding","addon","concurrency"],
+    "author":{
+      "name":   "Bent Cardan",
+      "email":  "bent@nothingsatisfies.com",
+      "url":    "http://req.link"
+    },
+    "license": "beerware"
+}
