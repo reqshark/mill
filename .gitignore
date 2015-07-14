@@ -9,4 +9,3 @@ v8
 deps/pkgconfig
 deps/include
 deps/lib/
-wtf.js
