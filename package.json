@@ -4,7 +4,8 @@
     "description": "bindings to libmill",
     "dependencies": {
       "bindings": "~1.2.1",
-      "nan": "~1.8.4"
+      "nan": "~1.8.4",
+      "ffi":""
     },
     "devDependencies":{
       "tape":         "~3.5.0",
@@ -24,5 +25,5 @@
       "email":  "bent@nothingsatisfies.com",
       "url":    "http://req.link"
     },
-    "license": "beerware"
+    "license": "MIT"
 }

@@ -1,0 +1,1 @@
+var ffi = require('ffi')
