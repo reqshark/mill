@@ -7,3 +7,7 @@ an experiment
 
 # [test](test/readme.markdown)
 tested on travis linux and osx.
+
+## license
+
+MIT

@@ -11,25 +11,16 @@ env:
 #  - NODE_V="0.12"
   - NODE_V="iojs"
 before_install:
-  - echo -e "echo nothing to configure" >> configure && chmod a+x configure
   - rm -rf ~/.nvm
   - git clone https://github.com/creationix/nvm.git ~/.nvm
   - source ~/.nvm/nvm.sh
   - nvm install $NODE_V && node --version
   - echo -e "require('fs').writeFile('platform.sh','export PLATFORM=\"'+require('os').platform()+'\"')" >> "check.js"
   - node check.js && chmod a+x platform.sh && source platform.sh
-  - export MILLPATH=`pwd`/deps
 install:
-  - git clone --depth 1 git://github.com/sustrik/libmill.git mill
-  - cd mill
-  - ./autogen.sh
-  - ./configure --prefix=$MILLPATH
+  - make build
   - make
-  - make install
-  - cd ..
-
 script:
-  - make
   - make check
 
 notifications:

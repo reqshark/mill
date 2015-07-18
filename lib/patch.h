@@ -1,13 +1,17 @@
 /*
+
   Copyright (c) 2015 Martin Sustrik
+
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"),
   to deal in the Software without restriction, including without limitation
   the rights to use, copy, modify, merge, publish, distribute, sublicense,
   and/or sell copies of the Software, and to permit persons to whom
   the Software is furnished to do so, subject to the following conditions:
+
   The above copyright notice and this permission notice shall be included
   in all copies or substantial portions of the Software.
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -15,6 +19,7 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
   IN THE SOFTWARE.
+
 */
 
 #ifndef LIBMILL_H_INCLUDED
@@ -22,7 +27,7 @@
 
 #include <errno.h>
 #include <stddef.h>
-#include <sys/types.h>
+#include <stdint.h>
 
 /******************************************************************************/
 /*  ABI versioning support                                                    */
@@ -68,6 +73,12 @@
 #endif
 
 /******************************************************************************/
+/*  Helpers                                                                   */
+/******************************************************************************/
+
+MILL_EXPORT int64_t now(void);
+
+/******************************************************************************/
 /*  Coroutines                                                                */
 /******************************************************************************/
 
@@ -97,18 +108,19 @@ MILL_EXPORT void mill_go_epilogue(void);
 
 MILL_EXPORT void mill_yield(const char *current);
 
-#define msleep(ms) mill_msleep((ms), __FILE__ ":" mill_string(__LINE__))
+#define msleep(deadline) mill_msleep((deadline),\
+    __FILE__ ":" mill_string(__LINE__))
 
-MILL_EXPORT void mill_msleep(long ms, const char *current);
+MILL_EXPORT void mill_msleep(int64_t deadline, const char *current);
 
-#define fdwait(fd, events, timeout) mill_fdwait((fd), (events), (timeout),\
+#define fdwait(fd, events, deadline) mill_fdwait((fd), (events), (deadline),\
     __FILE__ ":" mill_string(__LINE__))
 
 #define FDW_IN 1
 #define FDW_OUT 2
 #define FDW_ERR 4
 
-MILL_EXPORT int mill_fdwait(int fd, int events, long timeout,
+MILL_EXPORT int mill_fdwait(int fd, int events, int64_t deadline,
     const char *current);
 
 MILL_EXPORT void *cls(void);
@@ -241,14 +253,18 @@ MILL_EXPORT void *mill_choose_val(void);
 /******************************************************************************/
 
 //typedef struct tcpsock *tcpsock;
-
-//MILL_EXPORT tcpsock tcplisten(const char *addr);
-//MILL_EXPORT tcpsock tcpaccept(tcpsock s);
-//MILL_EXPORT tcpsock tcpconnect(const char *addr);
-//MILL_EXPORT void tcpsend(tcpsock s, const void *buf, size_t len);
-//MILL_EXPORT int tcpflush(tcpsock s);
-//MILL_EXPORT ssize_t tcprecv(tcpsock s, void *buf, size_t len);
-//MILL_EXPORT ssize_t tcprecvuntil(tcpsock s, void *buf, size_t len, char until);
+//MILL_EXPORT tcpsock tcplisten(const char *addr, int port);
+//MILL_EXPORT int tcpport(tcpsock s);
+//MILL_EXPORT tcpsock tcpaccept(tcpsock s, int64_t deadline);
+//MILL_EXPORT tcpsock tcpconnect(const char *addr, int port, int64_t deadline);
+//MILL_EXPORT size_t tcpsend(tcpsock s, const void *buf, size_t len,
+//    int64_t deadline);
+//MILL_EXPORT void tcpflush(tcpsock s,
+//    int64_t deadline);
+//MILL_EXPORT size_t tcprecv(tcpsock s, void *buf, size_t len,
+//    int64_t deadline);
+//MILL_EXPORT size_t tcprecvuntil(tcpsock s, void *buf, size_t len,
+//    unsigned char until, int64_t deadline);
 //MILL_EXPORT void tcpclose(tcpsock s);
 
 /******************************************************************************/
@@ -256,6 +272,6 @@ MILL_EXPORT void *mill_choose_val(void);
 /******************************************************************************/
 
 MILL_EXPORT void goredump(void);
-MILL_EXPORT void trace(int level);
+MILL_EXPORT void gotrace(int level);
 
 #endif

@@ -1,15 +1,13 @@
 var tape = require ('tape')
-require ('fs').readdir(__dirname, files )
+require ('fs').readdir(__dirname + '/tests', files )
 
 function files (er, fs) {
 
-  fs.shift()
+  fs.forEach(run)
 
-  fs.forEach(specRunner)
+  function run (f) {
 
-  function specRunner (f) {
-
-    tape ( f, require ( './' + f ) )
+    tape ( f, require ( './tests/' + f ) )
 
   }
 

@@ -1,2 +1,2 @@
 
-var nothing;
+module.exports = require('bindings')('mill.node')

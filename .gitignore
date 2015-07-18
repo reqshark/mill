@@ -3,9 +3,5 @@ node_modules
 npm-debug.log
 .DS_Store
 v8
-.dylib
-.a
-.la
-deps/pkgconfig
-deps/include
-deps/lib/
+libmill.h
+lib/lib
