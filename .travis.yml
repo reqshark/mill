@@ -11,15 +11,12 @@ env:
 #  - NODE_V="0.12"
   - NODE_V="iojs"
 before_install:
-  - rm -rf ~/.nvm
-  - git clone https://github.com/creationix/nvm.git ~/.nvm
-  - source ~/.nvm/nvm.sh
-  - nvm install $NODE_V && node --version
-  - echo -e "require('fs').writeFile('platform.sh','export PLATFORM=\"'+require('os').platform()+'\"')" >> "check.js"
-  - node check.js && chmod a+x platform.sh && source platform.sh
+  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm
+  - source ~/.nvm/nvm.sh && nvm install $NODE_V && node --version
 install:
   - make build
   - make
+  - source lib/ldconfig.sh
 script:
   - make check
 
