@@ -7,8 +7,6 @@ os:
   - linux
 
 env:
-#  - NODE_V="0.10"
-#  - NODE_V="0.12"
   - NODE_V="iojs"
 before_install:
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm

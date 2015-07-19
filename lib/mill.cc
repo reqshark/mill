@@ -19,7 +19,6 @@ void worker(int count, const char *text) {
 }
 
 NAN_METHOD(test){
-  NanScope();
   go(worker(4, "a"));
   go(worker(2, "b"));
   go(worker(3, "c"));
@@ -27,9 +26,15 @@ NAN_METHOD(test){
   NanReturnUndefined();
 }
 
-void Init(Local<Object> exports) {
+NAN_METHOD(trace){
+  gotrace(1);
+  NanReturnUndefined();
+};
+
+void Init(Local<Object> e) {
   NanScope();
-  EXPORT_METHOD(exports, test);
+  EXPORT_METHOD(e, test);
+  EXPORT_METHOD(e, trace);
 }
 
 NODE_MODULE(mill, Init)
