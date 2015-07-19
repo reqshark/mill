@@ -1,7 +1,7 @@
 #include "nan.h"
 
 extern "C" {
-#include "patch.h"
+#include "include/libmill.h"
 }
 
 using v8::Local;
