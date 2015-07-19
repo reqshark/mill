@@ -39,10 +39,10 @@
 /*  www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html  */
 
 /*  The current interface version. */
-#define MILL_VERSION_CURRENT 4
+#define MILL_VERSION_CURRENT 5
 
 /*  The latest revision of the current interface. */
-#define MILL_VERSION_REVISION 5
+#define MILL_VERSION_REVISION 0
 
 /*  How many past interface versions are still supported. */
 #define MILL_VERSION_AGE 0
@@ -252,20 +252,21 @@ MILL_EXPORT void *mill_choose_val(void);
 /*  TCP library                                                               */
 /******************************************************************************/
 
-//typedef struct tcpsock *tcpsock;
-//MILL_EXPORT tcpsock tcplisten(const char *addr, int port);
-//MILL_EXPORT int tcpport(tcpsock s);
-//MILL_EXPORT tcpsock tcpaccept(tcpsock s, int64_t deadline);
-//MILL_EXPORT tcpsock tcpconnect(const char *addr, int port, int64_t deadline);
-//MILL_EXPORT size_t tcpsend(tcpsock s, const void *buf, size_t len,
-//    int64_t deadline);
-//MILL_EXPORT void tcpflush(tcpsock s,
-//    int64_t deadline);
-//MILL_EXPORT size_t tcprecv(tcpsock s, void *buf, size_t len,
-//    int64_t deadline);
-//MILL_EXPORT size_t tcprecvuntil(tcpsock s, void *buf, size_t len,
-//    unsigned char until, int64_t deadline);
-//MILL_EXPORT void tcpclose(tcpsock s);
+typedef struct tcpsock *sock;
+
+MILL_EXPORT tcpsock tcplisten(const char *addr, int port);
+MILL_EXPORT int tcpport(tcpsock s);
+MILL_EXPORT tcpsock tcpaccept(tcpsock s, int64_t deadline);
+MILL_EXPORT tcpsock tcpconnect(const char *addr, int port, int64_t deadline);
+MILL_EXPORT size_t tcpsend(tcpsock s, const void *buf, size_t len,
+    int64_t deadline);
+MILL_EXPORT void tcpflush(tcpsock s,
+    int64_t deadline);
+MILL_EXPORT size_t tcprecv(tcpsock s, void *buf, size_t len,
+    int64_t deadline);
+MILL_EXPORT size_t tcprecvuntil(tcpsock s, void *buf, size_t len,
+    unsigned char until, int64_t deadline);
+MILL_EXPORT void tcpclose(tcpsock s);
 
 /******************************************************************************/
 /*  Debugging                                                                 */
