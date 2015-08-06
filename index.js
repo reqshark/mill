@@ -4,10 +4,11 @@ var ls = 0;
 module.exports = {
   test      : mill.test,
   trace     : mill.trace,
+  step1     : function( addr, port ) { return new s1('listen', addr, port)  },
   listen    : function( addr, port ) { return new tcp('listen', addr, port) }
 }
 
-require('util').inherits(tcp, require('events').EventEmitter);
+require('utildot').inherits(s1, tcp, require('events').EventEmitter);
 
 function tcp (type, addr, port) {
   this[type](addr, port);
@@ -17,4 +18,19 @@ function tcp (type, addr, port) {
 
 tcp.prototype.listen = function(addr, port) {
   this.socket = mill.listen(ls++, addr, port);
+}
+
+
+/**
+ * tutorial: step1
+ */
+
+function s1 (type, addr, port) {
+  this[type](addr, port);
+  this.t = type;
+  require('events').EventEmitter.call(this);
+}
+
+s1.prototype.listen = function(addr, port) {
+  this.socket = mill.s1(ls++, addr, port);
 }

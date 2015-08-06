@@ -14,16 +14,23 @@ using v8::FunctionTemplate;
 #define number As<Number>()->IntegerValue()
 #define T(C,S)C->Set(NanNew(# S),NanNew<FunctionTemplate>(S)->GetFunction());
 
-//static tcpsock ls[1024];
-//NAN_METHOD(listen){
-//  NanScope();
-//  int n = args[0].number;
-//  std::string *input;
-//  utf8 str (args[1]->ToString());
-//  input = new std::string(*str);
-//  ls[n] = tcplisten(input->c_str(), args[2].number);
-//  ret(NanNew<Number>(n));
-//}
+static tcpsock ls[1024];
+
+NAN_METHOD(s1){
+  NanScope();
+  int n = args[0].number;
+  ipaddr addr = iplocal(NULL, args[2].number, 0);
+  ls[n] = tcplisten(addr);
+  if(!ls[n]) {
+    perror("Can't open listening socket");
+    ret(NanNew<Number>(n));;
+  }
+  while(1) {
+    tcpsock as = tcpaccept(ls[n], -1);
+    printf("New connection!\n");
+    tcpclose(as);
+  }
+}
 
 void worker(int count, const char *text) {
     int i;
@@ -48,7 +55,7 @@ NAN_METHOD(trace){
 
 void Init(Local<Object> e) {
   NanScope();
-//  T(e, listen);
+  T(e, s1);
   T(e, test);
   T(e, trace);
 }
