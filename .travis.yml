@@ -7,7 +7,7 @@ os:
   - linux
 
 env:
-  - NODE_V="iojs-v2.5.0"
+  - NODE_V="iojs"
 before_install:
   - rm -rf ~/.nvm ~/.npm && git clone https://github.com/creationix/nvm.git ~/.nvm
   - source ~/.nvm/nvm.sh

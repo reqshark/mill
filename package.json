@@ -5,7 +5,7 @@
   "dependencies":     {
     "utildot":          "~0.0.4",
     "bindings":         "~1.2.1",
-    "nan":              "~1.8.4"
+    "nan":              "~2.0.5"
   },
   "devDependencies":  {
     "tape":             "~3.5.0",
@@ -18,7 +18,7 @@
   "scripts":          {
     "test":             "node test | tap-spec"
   },
-  "homepage":         "http://msg.pub",
+  "homepage":         "http://req.link",
   "keywords":         [
     "native",
     "binding",

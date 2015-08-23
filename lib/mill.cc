@@ -9,14 +9,10 @@ using v8::Object;
 using v8::Number;
 using v8::FunctionTemplate;
 
-#define ret NanReturnValue
-#define utf8 v8::String::Utf8Value
-#define number As<Number>()->IntegerValue()
-#define T(C,S)C->Set(NanNew(# S),NanNew<FunctionTemplate>(S)->GetFunction());
-
-static tcpsock ls[1024];
-
-#include "tutorial.cc"
+//using Nan::Callback;
+//using Nan::HandleScope;
+//using Nan::New;
+//#include "tutorial.cc"
 
 void worker(int count, const char *text) {
     int i;
@@ -31,21 +27,19 @@ NAN_METHOD(test){
   go(worker(2, "b"));
   go(worker(3, "c"));
   msleep(100);
-  NanReturnUndefined();
+  return;
 }
 
 NAN_METHOD(trace){
   gotrace(1);
-  NanReturnUndefined();
+  return;
 };
 
-void Init(Local<Object> e) {
-  NanScope();
-  T(e, s1);
-  T(e, s2);
-  T(e, s3);
-  T(e, test);
-  T(e, trace);
+static NAN_MODULE_INIT(Init) {
+//  NAN_EXPORT(target, s1);
+//  NAN_EXPORT(target, s2);
+//  NAN_EXPORT(target, s3);
+  NAN_EXPORT(target, test);
+  NAN_EXPORT(target, trace);
 }
-
 NODE_MODULE(mill, Init)
