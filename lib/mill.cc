@@ -1,7 +1,7 @@
 #include "nan.h"
 
 extern "C" {
-#include "include/libmill.h"
+#include "libmill.h"
 }
 
 using v8::Local;

@@ -7,18 +7,16 @@ os:
   - linux
 
 env:
-  - NODE_V="iojs"
+  - NODE_V="iojs-v2.5.0"
 before_install:
   - rm -rf ~/.nvm ~/.npm && git clone https://github.com/creationix/nvm.git ~/.nvm
   - source ~/.nvm/nvm.sh
   - nvm install $NODE_V
   - node --version
 install:
-  - make build
-  - make
-  - source lib/ldconfig.sh
+  - npm i
 script:
-  - make check
+  - npm t
 
 notifications:
   email: false
