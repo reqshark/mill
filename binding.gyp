@@ -32,7 +32,7 @@
                 "<!(node -e \"require('nan')\")",
                 'libmill',
             ],
-            'sources': [ 'lib/mill.cc' ],
+            'sources': [ 'module.cc' ],
         }
     ]
 }

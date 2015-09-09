@@ -5,23 +5,33 @@ go style concurrency for node.
 
 an experiment
 
-# build
 ```bash
+$ npm i libmill
+
+# or
 $ git clone https://github.com/reqshark/mill.git && cd mill
-$ make build
-$ make
-
-# linux systems need to do this extra step, making the LD PATH known at runtime
-# should probably just update binding.gyp... anyway for now:
-$ source lib/ldconfig.sh
-
-# now run the build test
-$ make check
+$ git submodule update --init
+$ npm i && npm t
 ```
 
-# [test](test/readme.markdown)
-tested on travis linux and osx.
+# build
+
+```bash
+$ make
+```
+
+# test
+```bash
+$ make clean && make && make check
+
+# or
+$ rm -rf node_modules build
+$ npm i
+$ npm t
+```
 
 ## license
 
 MIT
+
+<sub>*tested on travis linux and osx.*</sub>

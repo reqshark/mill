@@ -1,6 +1,10 @@
-# test
-[![philosophy](ff.png)](http://en.wikipedia.org/wiki/Unix_philosophy#.22Worse_is_better.22)
+# build and test [![Build Status](https://travis-ci.org/reqshark/mill.svg?branch=master)](https://travis-ci.org/reqshark/mill)
 ```bash
-$ make clean && make build && make && make check
+$ git clone https://github.com/reqshark/mill.git && cd mill
+$ make clean && make && make check
+
+# or
+$ make clean
+$ npm i
+$ npm t
 ```
-[![Build Status](https://travis-ci.org/reqshark/mill.svg?branch=master)](https://travis-ci.org/reqshark/mill)

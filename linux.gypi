@@ -22,8 +22,6 @@
 # may need these libraries linked on linux at some point:
 #    'ldflags': [ '-lrt', '-lanl' ],
 
-# hmm.. starting to think we dont need to release
-# our dep target using same compiler flags as the library
 #    'direct_dependent_settings': {
 #        'defines': [
 #            'HAVE_POSIX_MEMALIGN',
