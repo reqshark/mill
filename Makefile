@@ -1,11 +1,8 @@
 .PHONY: clean check test
 
 ALL:
-	npm i
-
-build:
 	git submodule update --init
-	lib/build.sh
+	npm i
 
 check:
 	npm test

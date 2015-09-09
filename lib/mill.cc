@@ -10,7 +10,6 @@ using v8::Number;
 using v8::FunctionTemplate;
 
 //using Nan::Callback;
-//using Nan::HandleScope;
 //using Nan::New;
 //#include "tutorial.cc"
 
@@ -35,11 +34,12 @@ NAN_METHOD(trace){
   return;
 };
 
-static NAN_MODULE_INIT(Init) {
-//  NAN_EXPORT(target, s1);
-//  NAN_EXPORT(target, s2);
-//  NAN_EXPORT(target, s3);
-  NAN_EXPORT(target, test);
-  NAN_EXPORT(target, trace);
+#define EXPORT_METHOD(C, S)                                                    \
+  Nan::Set(C, Nan::New(#S).ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(S)).ToLocalChecked());
+
+NAN_MODULE_INIT(Init) {
+  Nan::HandleScope scope;
+  EXPORT_METHOD(target, test);
+  EXPORT_METHOD(target, trace);
 }
 NODE_MODULE(mill, Init)
