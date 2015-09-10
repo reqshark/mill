@@ -1,4 +1,5 @@
 #include "nan.h"
+#include <assert.h>
 
 extern "C" {
 #include "libmill.h"
@@ -37,13 +38,21 @@ NAN_METHOD(trace){
 
 static tcpsock cs[1024];
 NAN_METHOD(connect){
-  String::Utf8Value addrstr(info[0]);
+
+  int64_t deadline = now() + 10000;
+
   int port = Nan::To<int>(info[1]).FromJust();
   int n = Nan::To<int>(info[2]).FromJust();
 
+  String::Utf8Value addrstr(info[0]);
   ipaddr addr = ipremote(*addrstr, port, 0, -1);
-  cs[n] = tcpconnect(addr, -1);
-  info.GetReturnValue().Set(Nan::New<Number>(n));
+  cs[n] = tcpconnect(addr, deadline);
+
+  if (cs[n] && !errno) {
+    info.GetReturnValue().Set(Nan::New<Number>(n));
+  } else {
+    info.GetReturnValue().Set(Nan::New<Number>(0));
+  }
 }
 
 //static tcpsock ls[1024];
