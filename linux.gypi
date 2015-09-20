@@ -1,12 +1,13 @@
 {
 # compiler settings to build the binary on linux
 
-# may need these defined on linux at some point:
-#    'defines': [
-#        'HAVE_POSIX_MEMALIGN',
-#        'HAVE_MPROTECT',
-#        'CLOCK_MONOTONIC',
-#    ],
+#may need these defined on linux at some point:
+    'defines': [
+        'HAVE_POSIX_MEMALIGN',
+        'HAVE_MPROTECT',
+        'CLOCK_MONOTONIC',
+        'HAVE_LIBANL'
+    ],
 
 # get rid of node-gyp noisey warnings:
     'cflags': [
@@ -18,6 +19,8 @@
         '-U_FORTIFY_SOURCE',
         '-D_FORTIFY_SOURCE=0',
     ],
+    'ldflags': [ '-lrt', '-lanl' ],
+
 
 # may need these libraries linked on linux at some point:
 #    'ldflags': [ '-lrt', '-lanl' ],

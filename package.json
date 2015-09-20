@@ -3,8 +3,6 @@
   "version":          "0.0.2",
   "description":      "bindings to libmill",
   "dependencies":     {
-    "utildot":          "~0.0.4",
-    "bindings":         "~1.2.1",
     "nan":              "~2.0.9"
   },
   "devDependencies":  {
