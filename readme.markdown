@@ -23,7 +23,7 @@ for msgs over tcp/ip, a server can use `tcplisten()`. once a client connects, th
 
 ### `tcplisten()` and `tcpaccept()`
 ```js
-var m = require('..');
+var m = require('libmill');
 
 var ls = m.tcplisten(5555);
 console.log('listening on port %s', m.tcpport(ls));
@@ -37,7 +37,7 @@ while(1){
 ### `tcpconnect()`
 ```js
 // connect socket
-var cs = require('..').tcpconnect('127.0.0.1', 5555);
+var cs = require('libmill').tcpconnect('127.0.0.1', 5555);
 var str = ': go style concurrency for node', num = 1;
 
 // minimize # of calls to OS kernel
@@ -49,11 +49,11 @@ send('msg #', str);
 send('msg #', str+'\r');
 function send(n, msg){
   n+=num+++msg+'\n';
-  require('..').tcpsend(cs, new Buffer(n));
+  require('libmill').tcpsend(cs, new Buffer(n));
 }
 
 // tcpsend() stores data in user space and tcpflush() pushes it to kernel
-require('..').tcpflush(cs);
+require('libmill').tcpflush(cs);
 ```
 # test
 ```bash

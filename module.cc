@@ -64,13 +64,17 @@ NAN_METHOD(tcpsend){
   info.GetReturnValue().Set(Nan::New<Number>(len));
 }
 
-
-
 NAN_METHOD(tcprecv){
-  char *buf = NULL;
-  size_t sz = tcprecv(UnwrapPointer<tcpsock>(info[0]), &buf, sizeof(buf), -1);
+  int rcvbuf = To<int>(info[1]).FromJust();
+
+  char buf[rcvbuf];
+  size_t sz = tcprecv(UnwrapPointer<tcpsock>(info[0]), buf, rcvbuf, -1);
+
+  buf[sz - 1] = 0;
+
   v8::Local<v8::Object> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
+
   info.GetReturnValue().Set(h);
 }
 
@@ -88,11 +92,30 @@ NAN_METHOD(tcprecvuntil){
   info.GetReturnValue().Set(h);
 }
 
+NAN_METHOD(tcpattach){
+  int fd = To<int>(info[0]).FromJust();
+  int listening = To<int>(info[1]).FromJust();
+
+  tcpsock s = tcpattach(fd, listening);
+
+  if (!s)
+    perror("attach error");
+
+  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
+}
+
+NAN_METHOD(tcpdetach){
+  int fd = tcpdetach(UnwrapPointer<tcpsock>(info[0]));
+  assert(fd != -1);
+  info.GetReturnValue().Set(Nan::New<Number>(fd));
+}
+
 NAN_METHOD(tcpport){
   tcpsock s = UnwrapPointer<tcpsock>(info[0]);
   int port = tcpport(s);
   info.GetReturnValue().Set(Nan::New<Number>(port));
 }
+
 NAN_METHOD(tcpflush){ tcpflush(UnwrapPointer<tcpsock>(info[0]), -1); }
 NAN_METHOD(tcpclose){ tcpclose(UnwrapPointer<tcpsock>(info[0])); }
 NAN_METHOD(trace){ gotrace(1);};
@@ -126,6 +149,8 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, tcpflush);
   EXPORT_METHOD(target, tcprecv);
   EXPORT_METHOD(target, tcprecvuntil);
+  EXPORT_METHOD(target, tcpattach);
+  EXPORT_METHOD(target, tcpdetach);
   EXPORT_METHOD(target, tcpport);
   EXPORT_METHOD(target, tcpclose);
 

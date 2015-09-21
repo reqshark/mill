@@ -9,6 +9,8 @@ module.exports = ctx = {
   tcpflush      : lib.tcpflush,
   tcprecv       : lib.tcprecv,
   tcprecvuntil  : lib.tcprecvuntil,
+  tcpattach     : lib.tcpattach,
+  tcpdetach     : lib.tcpdetach,
   tcpport       : lib.tcpport,
   tcpclose      : lib.tcpclose,
 }
