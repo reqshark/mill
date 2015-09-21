@@ -116,8 +116,74 @@ NAN_METHOD(tcpport){
   info.GetReturnValue().Set(Nan::New<Number>(port));
 }
 
-NAN_METHOD(tcpflush){ tcpflush(UnwrapPointer<tcpsock>(info[0]), -1); }
-NAN_METHOD(tcpclose){ tcpclose(UnwrapPointer<tcpsock>(info[0])); }
+NAN_METHOD(tcpflush){
+  tcpflush(UnwrapPointer<tcpsock>(info[0]), -1);
+}
+
+NAN_METHOD(tcpclose){
+  tcpclose(UnwrapPointer<tcpsock>(info[0]));
+}
+
+NAN_METHOD(udplisten){
+  int port = To<int>(info[0]).FromJust();
+
+  ipaddr addr = iplocal(NULL, port, 0);
+  udpsock s = udplisten(addr);
+
+  if (!s)
+    perror("udp socket listen err");
+
+  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
+}
+
+NAN_METHOD(udpport){
+  int port = udpport(UnwrapPointer<udpsock>(info[0]));
+  info.GetReturnValue().Set(Nan::New<Number>(port));
+}
+
+NAN_METHOD(udpsend){
+  String::Utf8Value ip(info[1]);
+  int port = To<int>(info[2]).FromJust();
+
+  ipaddr addr = ipremote(*ip, port, 0, -1);
+  udpsock s = UnwrapPointer<udpsock>(info[0]);
+  udpsend(s, addr, node::Buffer::Data(info[3]), node::Buffer::Length(info[3]));
+}
+
+NAN_METHOD(udprecv){
+  int rcvbuf = To<int>(info[1]).FromJust();
+  udpsock s = UnwrapPointer<udpsock>(info[0]);
+
+  char buf[rcvbuf];
+  ipaddr addr;
+  size_t sz = udprecv(s, &addr, buf, sizeof(buf), -1);
+
+  v8::Local<v8::Object> h = NewBuffer(sz).ToLocalChecked();
+  memcpy(node::Buffer::Data(h), buf, sz);
+
+  info.GetReturnValue().Set(h);
+}
+
+NAN_METHOD(udpclose){
+  udpclose(UnwrapPointer<udpsock>(info[0]));
+}
+
+NAN_METHOD(udpattach){
+  int fd = To<int>(info[0]).FromJust();
+  udpsock s = udpattach(fd);
+
+  if (!s)
+    perror("udp fd attach error");
+
+  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
+}
+
+NAN_METHOD(udpdetach){
+  int fd = udpdetach(UnwrapPointer<udpsock>(info[0]));
+  assert(fd != -1);
+  info.GetReturnValue().Set(Nan::New<Number>(fd));
+}
+
 NAN_METHOD(trace){ gotrace(1);};
 
 /* basic test to verify build */
@@ -153,6 +219,15 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, tcpdetach);
   EXPORT_METHOD(target, tcpport);
   EXPORT_METHOD(target, tcpclose);
+
+  /* udp library */
+  EXPORT_METHOD(target, udplisten);
+  EXPORT_METHOD(target, udpport);
+  EXPORT_METHOD(target, udpsend);
+  EXPORT_METHOD(target, udprecv);
+  EXPORT_METHOD(target, udpclose);
+  EXPORT_METHOD(target, udpattach);
+  EXPORT_METHOD(target, udpdetach);
 
   /* debug */
   EXPORT_METHOD(target, test);

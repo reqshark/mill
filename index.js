@@ -13,4 +13,11 @@ module.exports = ctx = {
   tcpdetach     : lib.tcpdetach,
   tcpport       : lib.tcpport,
   tcpclose      : lib.tcpclose,
+  udplisten     : lib.udplisten,
+  udpport       : lib.udpport,
+  udpsend       : lib.udpsend,
+  udprecv       : lib.udprecv,
+  udpclose      : lib.udpclose,
+  udpattach     : lib.udpattach,
+  udpdetach     : lib.udpdetach,
 }

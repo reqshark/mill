@@ -23,27 +23,26 @@ for msgs over tcp/ip, a server can use `tcplisten()`. once a client connects, th
 
 ### `tcplisten()` and `tcpaccept()`
 ```js
-var m = require('libmill');
-
-var ls = m.tcplisten(5555);
-console.log('listening on port %s', m.tcpport(ls));
+var mill = require('libmill');
+var ls = mill.tcplisten(5555);
+console.log('listening on port %s', mill.tcpport(ls));
 
 while(1){
-  var as = m.tcpaccept(ls);
-  console.log('\nnew connection\nmsg recvd: ' + m.tcprecvuntil(as));
-  m.tcpclose(as);
+  var as = mill.tcpaccept(ls);
+  console.log('\nnew connection\nmsg recvd: ' + mill.tcprecvuntil(as));
+  mill.tcpclose(as);
 }
 ```
 ### `tcpconnect()`
 ```js
 // connect socket
 var cs = require('libmill').tcpconnect('127.0.0.1', 5555);
-var str = ': go style concurrency for node', num = 1;
+var str = 'go style concurrency for node', num = 1;
 
 // minimize # of calls to OS kernel
 // send a few msg before tcpflush
-send('msg #', str);
-send('msg #', str);
+send('msg # ', str);
+send('msg # ', str);
 
 // msg delimiter is set to '\r', tells tcprecvuntil when to finish
 send('msg #', str+'\r');
@@ -54,6 +53,26 @@ function send(n, msg){
 
 // tcpsend() stores data in user space and tcpflush() pushes it to kernel
 require('libmill').tcpflush(cs);
+```
+# udp library
+### `udplisten()` and `udprecv()`
+```js
+// udp recv
+var m = require('libmill');
+var s = m.udplisten(5555);
+
+process.stdout.write('udp socket listening on port: '
+  + m.udpport(s) + '\n');
+
+while(1)
+  process.stdout.write(m.udprecv(s, 13) + '\n');
+
+```
+### `udpsend()`
+```js
+var mill = require('libmill');
+var s = mill.udplisten(5555);
+mill.udpsend(s, '10.0.1.13', 5555, new Buffer('Hello, world!'));
 ```
 # test
 ```bash
