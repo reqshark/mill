@@ -6,7 +6,7 @@ module.exports = function (t) {
 
     t.plan(1);
 
-    mill.trace();
+    mill.gotrace();
 
     t.ok((mill.test() === undefined), 'built');
   })

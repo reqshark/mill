@@ -1,7 +1,6 @@
 var lib  = require('./build/Release/mill.node');
 module.exports = ctx = {
   test          : lib.test,
-  trace         : lib.trace,
   tcplisten     : lib.tcplisten,
   tcpaccept     : lib.tcpaccept,
   tcpconnect    : lib.tcpconnect,
@@ -20,4 +19,17 @@ module.exports = ctx = {
   udpclose      : lib.udpclose,
   udpattach     : lib.udpattach,
   udpdetach     : lib.udpdetach,
+  unixlisten    : lib.unixlisten,
+  unixaccept    : lib.unixaccept,
+  unixconnect   : lib.unixconnect,
+  unixpair      : lib.unixpair,
+  unixsend      : lib.unixsend,
+  unixflush     : lib.unixflush,
+  unixrecv      : lib.unixrecv,
+  unixrecvuntil : lib.unixrecvuntil,
+  unixclose     : lib.unixclose,
+  unixattach    : lib.unixattach,
+  unixdetach    : lib.unixdetach,
+  goredump      : lib.goredump,
+  gotrace       : lib.gotrace
 }

@@ -16,18 +16,19 @@ extern "C" {
 #include "libmill.h"
 }
 
-
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 NAN_METHOD(tcplisten){
   int port = To<int>(info[0]).FromJust();
 
   ipaddr addr = iplocal(NULL, port, 0);
-  tcpsock ls = tcplisten(addr, -1);
+  tcpsock ls = tcplisten(addr, 10);
 
   if (!ls)
     perror("Can't open listening socket");
@@ -64,13 +65,12 @@ NAN_METHOD(tcpsend){
   info.GetReturnValue().Set(Nan::New<Number>(len));
 }
 
+//TODO: deadline
 NAN_METHOD(tcprecv){
   int rcvbuf = To<int>(info[1]).FromJust();
 
   char buf[rcvbuf];
   size_t sz = tcprecv(UnwrapPointer<tcpsock>(info[0]), buf, rcvbuf, -1);
-
-  buf[sz - 1] = 0;
 
   v8::Local<v8::Object> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
@@ -78,13 +78,12 @@ NAN_METHOD(tcprecv){
   info.GetReturnValue().Set(h);
 }
 
+//TODO: deadline
 NAN_METHOD(tcprecvuntil){
   tcpsock s = UnwrapPointer<tcpsock>(info[0]);
 
   char buf[256];
   size_t sz = tcprecvuntil(s, buf, sizeof(buf), "\r", 1, -1);
-
-  buf[sz - 1] = 0;
 
   Local<Value> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
@@ -116,6 +115,7 @@ NAN_METHOD(tcpport){
   info.GetReturnValue().Set(Nan::New<Number>(port));
 }
 
+//TODO: deadline
 NAN_METHOD(tcpflush){
   tcpflush(UnwrapPointer<tcpsock>(info[0]), -1);
 }
@@ -184,7 +184,108 @@ NAN_METHOD(udpdetach){
   info.GetReturnValue().Set(Nan::New<Number>(fd));
 }
 
-NAN_METHOD(trace){ gotrace(1);};
+NAN_METHOD(unixlisten){
+  String::Utf8Value sockname(info[0]);
+  char *name = *sockname;
+  struct stat st;
+  if (stat(name, &st) == 0)
+    assert(unlink(name) == 0);
+
+  unixsock ls = unixlisten(name, 10);
+  assert(ls);
+
+  info.GetReturnValue().Set(WrapPointer(ls, sizeof(&ls)));
+}
+
+//TODO: deadline
+NAN_METHOD(unixaccept){
+  unixsock as = unixaccept(UnwrapPointer<unixsock>(info[0]), -1);
+  assert(as);
+
+  info.GetReturnValue().Set(WrapPointer(as, sizeof(&as)));
+}
+
+NAN_METHOD(unixconnect){
+  String::Utf8Value sockname(info[0]);
+  char *name = *sockname;
+  unixsock cs = unixconnect(name);
+  assert(cs);
+
+  info.GetReturnValue().Set(WrapPointer(cs, sizeof(&cs)));
+}
+
+NAN_METHOD(unixpair){
+  unixsock a = UnwrapPointer<unixsock>(info[0]);
+  unixsock b = UnwrapPointer<unixsock>(info[1]);
+
+  /* socketpair(AF_UNIX, SOCK_STREAM, 0, fd); */
+  unixpair(&a, &b);
+  assert(errno == 0);
+}
+
+//TODO: deadline
+NAN_METHOD(unixsend){
+  size_t sz = unixsend(UnwrapPointer<unixsock>(info[0]),
+    node::Buffer::Data(info[1]), node::Buffer::Length(info[1]), -1);
+
+  info.GetReturnValue().Set(Nan::New<Number>(sz));
+}
+
+//TODO: deadline
+NAN_METHOD(unixflush){
+  unixflush(UnwrapPointer<unixsock>(info[0]), -1);
+}
+
+//TODO: deadline
+NAN_METHOD(unixrecv){
+  int rcvbuf = To<int>(info[1]).FromJust();
+
+  /* should make it a static char */
+  char buf[rcvbuf];
+  size_t sz = unixrecv(UnwrapPointer<unixsock>(info[0]), buf, rcvbuf, -1);
+
+  v8::Local<v8::Object> h = NewBuffer(sz).ToLocalChecked();
+  memcpy(node::Buffer::Data(h), buf, sz);
+
+  info.GetReturnValue().Set(h);
+}
+
+//TODO: deadline
+NAN_METHOD(unixrecvuntil){
+  int rcvbuf = To<int>(info[1]).FromJust();
+  unixsock s = UnwrapPointer<unixsock>(info[0]);
+
+  char buf[rcvbuf];
+  size_t sz = unixrecvuntil(s, buf, rcvbuf, "\r", 1, -1);
+
+  Local<Value> h = NewBuffer(sz).ToLocalChecked();
+  memcpy(node::Buffer::Data(h), buf, sz);
+
+  info.GetReturnValue().Set(h);
+}
+
+NAN_METHOD(unixclose){
+  unixclose(UnwrapPointer<unixsock>(info[0]));
+}
+
+NAN_METHOD(unixattach){
+  int fd = To<int>(info[0]).FromJust();
+  int listening = To<int>(info[1]).FromJust();
+
+  unixsock s = unixattach(fd, listening);
+  assert(s);
+
+  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
+}
+
+NAN_METHOD(unixdetach){
+  int fd = unixdetach(UnwrapPointer<unixsock>(info[0]));
+  assert(fd != -1);
+  info.GetReturnValue().Set(Nan::New<Number>(fd));
+}
+
+NAN_METHOD(goredump){ goredump();};
+NAN_METHOD(gotrace){ gotrace(1);};
 
 /* basic test to verify build */
 void worker(int count, const char *text) {
@@ -229,9 +330,23 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, udpattach);
   EXPORT_METHOD(target, udpdetach);
 
+  /* unix library */
+  EXPORT_METHOD(target, unixlisten);
+  EXPORT_METHOD(target, unixaccept);
+  EXPORT_METHOD(target, unixconnect);
+  EXPORT_METHOD(target, unixpair);
+  EXPORT_METHOD(target, unixsend);
+  EXPORT_METHOD(target, unixflush);
+  EXPORT_METHOD(target, unixrecv);
+  EXPORT_METHOD(target, unixrecvuntil);
+  EXPORT_METHOD(target, unixclose);
+  EXPORT_METHOD(target, unixattach);
+  EXPORT_METHOD(target, unixdetach);
+
   /* debug */
+  EXPORT_METHOD(target, gotrace);
+  EXPORT_METHOD(target, goredump);
   EXPORT_METHOD(target, test);
-  EXPORT_METHOD(target, trace);
 }
 
 NODE_MODULE(mill, Init)
