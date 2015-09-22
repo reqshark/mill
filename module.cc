@@ -1,14 +1,17 @@
 #include "nan.h"
 
-using v8::String;
-using v8::Local;
-using v8::Object;
-using v8::Number;
 using v8::FunctionTemplate;
+using v8::Number;
+using v8::String;
+using v8::Object;
 using v8::Value;
+using v8::Local;
 
-using Nan::To;
+using Nan::MaybeLocal;
 using Nan::NewBuffer;
+using Nan::Maybe;
+using Nan::New;
+using Nan::To;
 
 #include "ref.h"
 
@@ -24,71 +27,187 @@ extern "C" {
 #include <sys/stat.h>
 #include <unistd.h>
 
+#define IPADDR_IPV4 1
+#define IPADDR_IPV6 2
+#define IPADDR_PREF_IPV4 3
+#define IPADDR_PREF_IPV6 4
+
+NAN_METHOD(iplocal){
+  /* default port */
+  int port = 5555;
+
+  /* set mode or go with default of zero */
+  int mode = 0;
+  if (info[2]->IsNumber())
+    mode = To<int>(info[2]).FromJust();
+
+  /* ip address */
+  char *ip = NULL;
+  if (info[0]->IsString()) {
+    String::Utf8Value ip(info[0]);
+    if (info[1]->IsNumber())
+      port = To<int>(info[1]).FromJust();
+  }
+
+  /* check port */
+  if (info[0]->IsNumber()) {
+    port = To<int>(info[0]).FromJust();
+    if (info[1]->IsNumber())
+      mode = To<int>(info[1]).FromJust();
+  }
+
+  /* get an ipaddr */
+  ipaddr ipv = iplocal(ip, port, mode);
+  size_t sz = sizeof(&ipv);
+
+  /* return a libmill ipaddr as a node buffer pointer */
+  Local<Object> addr = NewBuffer(sz).ToLocalChecked();
+  memcpy(node::Buffer::Data(addr), &ipv, sz);
+  info.GetReturnValue().Set(addr);
+}
+
+NAN_METHOD(ipremote){
+  /* default port */
+  int port = 5555;
+
+  /* deadline */
+  int64_t deadline = -1;
+  if (info[3]->IsNumber())
+    deadline = now() + To<int64_t>(info[3]).FromJust();
+
+  /* set mode or go with default of zero */
+  int mode = 0;
+  if (info[2]->IsNumber())
+    mode = To<int>(info[2]).FromJust();
+
+  /* ip address */
+  char *ip = NULL;
+  if (info[0]->IsString()) {
+    String::Utf8Value ip(info[0]);
+    if (info[1]->IsNumber())
+      port = To<int>(info[1]).FromJust();
+  }
+
+  /* check port */
+  if (info[0]->IsNumber()) {
+    port = To<int>(info[0]).FromJust();
+    if (info[1]->IsNumber())
+      mode = To<int>(info[1]).FromJust();
+  }
+
+  /* get an ipaddr */
+  ipaddr ipv = ipremote(ip, port, mode, deadline);
+  size_t sz = sizeof(&ipv);
+
+  /* create a node buffer pointer */
+  Local<Object> addr = NewBuffer(sz).ToLocalChecked();
+  memcpy(node::Buffer::Data(addr), &ipv, sz);
+  info.GetReturnValue().Set(addr);
+}
+
 NAN_METHOD(tcplisten){
-  int port = To<int>(info[0]).FromJust();
+  /* backlog settings */
+  int backlog = 10;
+  if (info[1]->IsNumber())
+    backlog = To<int>(info[1]).FromJust();
 
-  ipaddr addr = iplocal(NULL, port, 0);
-  tcpsock ls = tcplisten(addr, 10);
-
-  if (!ls)
-    perror("Can't open listening socket");
-
+  /* dereference and pass ipaddr buffer to tcplisten */
+  tcpsock ls = tcplisten(*UnwrapPointer<ipaddr*>(info[0]), backlog);
+  assert(ls);
   info.GetReturnValue().Set(WrapPointer(ls, sizeof(&ls)));
 }
 
+NAN_METHOD(tcpport){
+  tcpsock s = UnwrapPointer<tcpsock>(info[0]);
+  int port = tcpport(s);
+  info.GetReturnValue().Set(Nan::New<Number>(port));
+}
+
 NAN_METHOD(tcpaccept){
-  tcpsock as = tcpaccept(UnwrapPointer<tcpsock>(info[0]), -1);
+  /* deadline */
+  int64_t deadline = -1;
+  if (info[1]->IsNumber())
+    deadline = now() + To<int64_t>(info[1]).FromJust();
 
-  if (!as)
-    perror("accept error");
-
+  tcpsock as = tcpaccept(UnwrapPointer<tcpsock>(info[0]), deadline);
+  assert(as);
   info.GetReturnValue().Set(WrapPointer(as, sizeof(&as)));
 }
 
 NAN_METHOD(tcpconnect){
-  int port = To<int>(info[1]).FromJust();
-  String::Utf8Value ip(info[0]);
+  /* deadline */
+  int64_t deadline = -1;
+  if (info[1]->IsNumber())
+    deadline = now() + To<int64_t>(info[1]).FromJust();
 
-  ipaddr addr = ipremote(*ip, port, 0, -1);
-  tcpsock cs = tcpconnect(addr, -1);
-
-  if (!cs)
-    perror("connect error");
-
+  /* pass an ipremote buffer to tcpconnect */
+  tcpsock cs = tcpconnect(*UnwrapPointer<ipaddr*>(info[0]), deadline);
+  assert(cs);
   info.GetReturnValue().Set(WrapPointer(cs, sizeof(&cs)));
 }
 
 NAN_METHOD(tcpsend){
-  size_t len = tcpsend(UnwrapPointer<tcpsock>(info[0]),
-    node::Buffer::Data(info[1]), node::Buffer::Length(info[1]), -1);
+  /* deadline */
+  int64_t deadline = -1;
+  if (info[2]->IsNumber())
+    deadline = now() + To<int64_t>(info[2]).FromJust();
 
-  info.GetReturnValue().Set(Nan::New<Number>(len));
+  size_t sz = tcpsend(UnwrapPointer<tcpsock>(info[0]),
+    node::Buffer::Data(info[1]), node::Buffer::Length(info[1]), deadline);
+
+  info.GetReturnValue().Set(New<Number>(sz));
 }
 
-//TODO: deadline
+NAN_METHOD(tcpflush){
+  /* deadline */
+  int64_t deadline = -1;
+  if (info[1]->IsNumber())
+    deadline = now() + To<int64_t>(info[1]).FromJust();
+
+  tcpflush(UnwrapPointer<tcpsock>(info[0]), deadline);
+}
+
 NAN_METHOD(tcprecv){
+  /* deadline */
+  int64_t deadline = -1;
+  if (info[2]->IsNumber())
+    deadline = now() + To<int64_t>(info[2]).FromJust();
+
   int rcvbuf = To<int>(info[1]).FromJust();
 
   char buf[rcvbuf];
-  size_t sz = tcprecv(UnwrapPointer<tcpsock>(info[0]), buf, rcvbuf, -1);
+  size_t sz = tcprecv(UnwrapPointer<tcpsock>(info[0]), buf, rcvbuf, deadline);
 
-  v8::Local<v8::Object> h = NewBuffer(sz).ToLocalChecked();
-  memcpy(node::Buffer::Data(h), buf, sz);
+  v8::Local<v8::Object> rc = NewBuffer(sz).ToLocalChecked();
+  memcpy(node::Buffer::Data(rc), buf, sz);
 
-  info.GetReturnValue().Set(h);
+  info.GetReturnValue().Set(rc);
 }
 
-//TODO: deadline
+//TODO: delimiters: const char *delims, size_t delimcount
 NAN_METHOD(tcprecvuntil){
+  /* deadline */
+  int64_t deadline = -1;
+  if (info[2]->IsNumber())
+    deadline = now() + To<int64_t>(info[2]).FromJust();
+
+  /* recv buffer size */
+  int rcvbuf = To<int>(info[1]).FromJust();
+  char buf[rcvbuf];
+
+  /* recvuntil delimiters */
   tcpsock s = UnwrapPointer<tcpsock>(info[0]);
+  size_t sz = tcprecvuntil(s, buf, sizeof(buf), "\r", 1, deadline);
 
-  char buf[256];
-  size_t sz = tcprecvuntil(s, buf, sizeof(buf), "\r", 1, -1);
+  /* fill recv buffer from OS */
+  Local<Value> rc = NewBuffer(sz).ToLocalChecked();
+  memcpy(node::Buffer::Data(rc), buf, sz);
 
-  Local<Value> h = NewBuffer(sz).ToLocalChecked();
-  memcpy(node::Buffer::Data(h), buf, sz);
+  info.GetReturnValue().Set(rc);
+}
 
-  info.GetReturnValue().Set(h);
+NAN_METHOD(tcpclose){
+  tcpclose(UnwrapPointer<tcpsock>(info[0]));
 }
 
 NAN_METHOD(tcpattach){
@@ -107,21 +226,6 @@ NAN_METHOD(tcpdetach){
   int fd = tcpdetach(UnwrapPointer<tcpsock>(info[0]));
   assert(fd != -1);
   info.GetReturnValue().Set(Nan::New<Number>(fd));
-}
-
-NAN_METHOD(tcpport){
-  tcpsock s = UnwrapPointer<tcpsock>(info[0]);
-  int port = tcpport(s);
-  info.GetReturnValue().Set(Nan::New<Number>(port));
-}
-
-//TODO: deadline
-NAN_METHOD(tcpflush){
-  tcpflush(UnwrapPointer<tcpsock>(info[0]), -1);
-}
-
-NAN_METHOD(tcpclose){
-  tcpclose(UnwrapPointer<tcpsock>(info[0]));
 }
 
 NAN_METHOD(udplisten){
@@ -307,6 +411,10 @@ NAN_METHOD(test){
 
 NAN_MODULE_INIT(Init) {
   Nan::HandleScope scope;
+
+  /* ip resolution */
+  EXPORT_METHOD(target, iplocal);
+  EXPORT_METHOD(target, ipremote);
 
   /* tcp library */
   EXPORT_METHOD(target, tcplisten);
