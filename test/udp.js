@@ -1,26 +1,39 @@
 var lib = require('..');
 
 module.exports = function udp (t) {
-  var ipaddr, ls, port, size_t;
-  t.test('udp listen', listen);
-  //t.test('udp msg', msg);
+  t.test('udp msgs', listen);
 }
 
 function listen (t) {
-  t.plan(3);
+  t.plan(5);
 
-  size_t = 8;
-  port = 44444;
-  ipaddr = lib.iplocal(port);
-  ls = lib.udplisten(ipaddr);
+  var buf = new Buffer('Hello, world!');
+  var size_t = 8;
+  var port = 44444;
+
+  var ipaddr = lib.iplocal(port);
+  var ls = lib.udplisten(ipaddr);
 
   t.ok( Buffer.isBuffer(ls),   'listening socket (ls) is a buffer' );
   t.is( ls.length,  size_t, 'socket length is ' + size_t  );
   t.is( lib.udpport(ls),  port, 'udp listening on port ' + port  );
-}
 
-//function msg (t) {
-//  t.plan(1);
-//  lib.udpsend(ls, ipaddr, new Buffer('Hello, world!'));
-//  t.ok(ls, 'ls: ' + ls);
-//}
+  var i = 10000;
+  var msgs = [];
+
+  while(i--){
+    lib.udpsend(ls, ipaddr, buf);
+    msgs.push(lib.udprecv(ls, 13));
+  }
+
+  var bufferLoss = [];
+  var validator = String(buf);
+  var l = msgs.length;
+
+  t.ok(l, 'total udp msgs sent and recv\'d: ' + ( l/1000 )+'K');
+
+  while(l--) if (String(msgs[l]) !== validator)
+    bufferLoss.push(msgs[l]);
+
+  t.ok(validator, 'total message loss: '+ bufferLoss.length);
+}

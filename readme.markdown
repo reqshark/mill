@@ -23,56 +23,71 @@ for msgs over tcp/ip, a server can use `tcplisten()`. once a client connects, th
 
 ### `tcplisten()` and `tcpaccept()`
 ```js
-var mill = require('libmill');
-var ls = mill.tcplisten(5555);
-console.log('listening on port %s', mill.tcpport(ls));
+var lib = require('libmill');
+
+/* create an ipaddr */
+var ipaddr = lib.iplocal(5555);
+
+/* listen on the ipaddr */
+var ls = lib.tcplisten(ipaddr);
+console.log('listening on port %s', lib.tcpport(ls));
 
 while(1){
-  var as = mill.tcpaccept(ls);
-  console.log('\nnew connection\nmsg recvd: ' + mill.tcprecvuntil(as));
-  mill.tcpclose(as);
+  /* accept and establish tcp connection */
+  var as = lib.tcpaccept(ls);
+  console.log('\nnew connection\nmsg recvd: ' + lib.tcprecvuntil(as));
+
+  /* close tcp connection */
+  lib.tcpclose(as);
 }
 ```
 ### `tcpconnect()`
 ```js
-// connect socket
-var cs = require('libmill').tcpconnect('127.0.0.1', 5555);
+var lib = require('libmill');
+
+/* create an ipaddr */
+var ipaddr = lib.iplocal(5555);
+
+/* connect over the ipaddr */
+var cs = lib.tcpconnect(ipaddr);
 var str = 'go style concurrency for node', num = 1;
 
-// minimize # of calls to OS kernel
-// send a few msg before tcpflush
+/* send a few msg before tcpflush */
+/* delimiter is set to '\r', tells tcprecvuntil when to finish */
 send('msg # ', str);
 send('msg # ', str);
-
-// msg delimiter is set to '\r', tells tcprecvuntil when to finish
 send('msg #', str+'\r');
 function send(n, msg){
-  n+=num+++msg+'\n';
-  require('libmill').tcpsend(cs, new Buffer(n));
+  n+= num+++msg+'\n';
+  lib.tcpsend(cs, new Buffer(n));
 }
 
-// tcpsend() stores data in user space and tcpflush() pushes it to kernel
-require('libmill').tcpflush(cs);
+/* tcpsend() stores data in user space and tcpflush() pushes it to kernel */
+lib.tcpflush(cs);
 ```
+
 # udp library
 ### `udplisten()` and `udprecv()`
 ```js
-// udp recv
-var m = require('libmill');
-var s = m.udplisten(5555);
+var lib = require('libmill');
 
-process.stdout.write('udp socket listening on port: '
-  + m.udpport(s) + '\n');
+/* create an ipaddr */
+var ipaddr = lib.iplocal(4444);
+
+/* listen on ipaddr */
+var ls = lib.udplisten(ipaddr);
+process.stdout.write('udp socket listening on port: ' + lib.udpport(ls) + '\n');
 
 while(1)
-  process.stdout.write(m.udprecv(s, 13) + '\n');
-
+  process.stdout.write(lib.udprecv(ls, 13) + '\n');
 ```
+
 ### `udpsend()`
 ```js
-var mill = require('libmill');
-var s = mill.udplisten(5555);
-mill.udpsend(s, '10.0.1.13', 5555, new Buffer('Hello, world!'));
+var s = lib.udplisten(ipaddr);
+var buf = new Buffer('Hello, world!');
+
+lib.udpsend(s, ipaddr, buf);
 ```
 # test
 see [`test` directory](test)
