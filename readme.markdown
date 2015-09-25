@@ -75,14 +75,7 @@ var s = mill.udplisten(5555);
 mill.udpsend(s, '10.0.1.13', 5555, new Buffer('Hello, world!'));
 ```
 # test
-```bash
-$ make clean && make && make check
-
-# or
-$ rm -rf node_modules build
-$ npm i
-$ npm t
-```
+see [`test` directory](test)
 
 ## license
 

@@ -27,6 +27,10 @@ extern "C" {
 #include <sys/stat.h>
 #include <unistd.h>
 
+/******************************************************************************/
+/*  IP address library                                                        */
+/******************************************************************************/
+
 #define IPADDR_IPV4 1
 #define IPADDR_IPV6 2
 #define IPADDR_PREF_IPV4 3
@@ -104,6 +108,10 @@ NAN_METHOD(ipremote){
   memcpy(node::Buffer::Data(addr), &ipv, sz);
   info.GetReturnValue().Set(addr);
 }
+
+/******************************************************************************/
+/*  TCP library                                                               */
+/******************************************************************************/
 
 NAN_METHOD(tcplisten){
   /* backlog settings */
@@ -225,35 +233,31 @@ NAN_METHOD(tcpattach){
 NAN_METHOD(tcpdetach){
   int fd = tcpdetach(UnwrapPointer<tcpsock>(info[0]));
   assert(fd != -1);
-  info.GetReturnValue().Set(Nan::New<Number>(fd));
+  info.GetReturnValue().Set(New<Number>(fd));
 }
 
+/******************************************************************************/
+/*  UDP library                                                               */
+/******************************************************************************/
+
 NAN_METHOD(udplisten){
-  int port = To<int>(info[0]).FromJust();
-
-  ipaddr addr = iplocal(NULL, port, 0);
-  udpsock s = udplisten(addr);
-
-  if (!s)
-    perror("udp socket listen err");
-
+  udpsock s = udplisten(*UnwrapPointer<ipaddr*>(info[0]));
+  assert(s);
   info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
 }
 
 NAN_METHOD(udpport){
   int port = udpport(UnwrapPointer<udpsock>(info[0]));
-  info.GetReturnValue().Set(Nan::New<Number>(port));
+  info.GetReturnValue().Set(New<Number>(port));
 }
 
 NAN_METHOD(udpsend){
-  String::Utf8Value ip(info[1]);
-  int port = To<int>(info[2]).FromJust();
-
-  ipaddr addr = ipremote(*ip, port, 0, -1);
   udpsock s = UnwrapPointer<udpsock>(info[0]);
-  udpsend(s, addr, node::Buffer::Data(info[3]), node::Buffer::Length(info[3]));
+  ipaddr addr = *UnwrapPointer<ipaddr*>(info[1]);
+  udpsend(s, addr, node::Buffer::Data(info[2]), node::Buffer::Length(info[2]));
 }
 
+//TODO: deadline
 NAN_METHOD(udprecv){
   int rcvbuf = To<int>(info[1]).FromJust();
   udpsock s = UnwrapPointer<udpsock>(info[0]);
@@ -265,6 +269,8 @@ NAN_METHOD(udprecv){
   v8::Local<v8::Object> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
 
+  //TODO: also return ipaddr addr
+
   info.GetReturnValue().Set(h);
 }
 
@@ -275,10 +281,7 @@ NAN_METHOD(udpclose){
 NAN_METHOD(udpattach){
   int fd = To<int>(info[0]).FromJust();
   udpsock s = udpattach(fd);
-
-  if (!s)
-    perror("udp fd attach error");
-
+  assert(s);
   info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
 }
 
@@ -287,6 +290,10 @@ NAN_METHOD(udpdetach){
   assert(fd != -1);
   info.GetReturnValue().Set(Nan::New<Number>(fd));
 }
+
+/******************************************************************************/
+/*  UNIX library                                                              */
+/******************************************************************************/
 
 NAN_METHOD(unixlisten){
   String::Utf8Value sockname(info[0]);
@@ -388,8 +395,8 @@ NAN_METHOD(unixdetach){
   info.GetReturnValue().Set(Nan::New<Number>(fd));
 }
 
-NAN_METHOD(goredump){ goredump();};
-NAN_METHOD(gotrace){ gotrace(1);};
+NAN_METHOD(goredump){ goredump(); };
+NAN_METHOD(gotrace) { gotrace(1); };
 
 /* basic test to verify build */
 void worker(int count, const char *text) {

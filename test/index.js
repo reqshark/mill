@@ -1,14 +1,7 @@
 var tape = require ('tape')
-require ('fs').readdir(__dirname + '/tests', files )
-
-function files (er, fs) {
-
-  fs.forEach(run)
-
-  function run (f) {
-
-    tape ( f, require ( './tests/' + f ) )
-
-  }
-
+tape('==================== mill testsuite summary ====================', tests);
+function tests (t){
+  t.test('===== ipaddr buffers =====', require('./ipaddr'));
+  t.test('===== tcp library =====', require('./tcp'));
+  t.test('===== udp library =====', require('./udp'));
 }
