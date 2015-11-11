@@ -30,9 +30,9 @@
             'dependencies': [ 'libmill', ],
             'include_dirs': [
                 "<!(node -e \"require('nan')\")",
-                'libmill',
+                'libmill'
             ],
-            'sources': [ 'module.cc' ],
+            'sources': [ 'binding.cc' ],
         }
     ]
 }

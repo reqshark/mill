@@ -1,7 +1,32 @@
+/*
+
+  Copyright (c) 2015 Bent Cardan
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including without limitation
+  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+  and/or sell copies of the Software, and to permit persons to whom
+  the Software is furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included
+  in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+  IN THE SOFTWARE.
+
+*/
+
 #include "nan.h"
 
 using v8::FunctionTemplate;
 using v8::Number;
+using v8::Boolean;
 using v8::String;
 using v8::Object;
 using v8::Value;
@@ -13,19 +38,19 @@ using Nan::Maybe;
 using Nan::New;
 using Nan::To;
 
-#include "ref.h"
-
 extern "C" {
 #include "libmill.h"
 }
 
+#include <unistd.h>
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
+
+#include "ref.h"
+#include "addr.h"
 
 /******************************************************************************/
 /*  IP address library                                                        */
@@ -259,19 +284,24 @@ NAN_METHOD(udpsend){
 
 //TODO: deadline
 NAN_METHOD(udprecv){
-  int rcvbuf = To<int>(info[1]).FromJust();
-  udpsock s = UnwrapPointer<udpsock>(info[0]);
-
-  char buf[rcvbuf];
   ipaddr addr;
-  size_t sz = udprecv(s, &addr, buf, sizeof(buf), -1);
+  int rcvbuf = To<int>(info[1]).FromJust();
+  char buf[rcvbuf];
 
-  v8::Local<v8::Object> h = NewBuffer(sz).ToLocalChecked();
+  udpsock s = UnwrapPointer<udpsock>(info[0]);
+  size_t sz = udprecv(s, &addr, buf, sizeof(buf), -1);
+  Local<Object> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
 
-  //TODO: also return ipaddr addr
+  char *ip = ntop(addr);
 
-  info.GetReturnValue().Set(h);
+  Local<Object> obj = Nan::New<Object>();
+  Nan::Set(obj, New("buf").ToLocalChecked(), h);
+  Nan::Set(obj, New("addr").ToLocalChecked(), New<String>(ip).ToLocalChecked());
+
+  free(ip);
+
+  info.GetReturnValue().Set(obj);
 }
 
 NAN_METHOD(udpclose){
@@ -290,6 +320,7 @@ NAN_METHOD(udpdetach){
   assert(fd != -1);
   info.GetReturnValue().Set(Nan::New<Number>(fd));
 }
+
 
 /******************************************************************************/
 /*  UNIX library                                                              */

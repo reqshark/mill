@@ -23,7 +23,7 @@ function listen (t) {
 
   while(i--){
     lib.udpsend(ls, ipaddr, buf);
-    msgs.push(lib.udprecv(ls, 13));
+    msgs.push(lib.udprecv(ls, 13).buf);
   }
 
   var bufferLoss = [];
