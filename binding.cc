@@ -50,7 +50,6 @@ extern "C" {
 #include <string.h>
 
 #include "ref.h"
-#include "addr.h"
 
 /******************************************************************************/
 /*  IP address library                                                        */
@@ -283,6 +282,7 @@ NAN_METHOD(udpsend){
 }
 
 //TODO: deadline
+static char ipstr[IPADDR_MAXSTRLEN];
 NAN_METHOD(udprecv){
   ipaddr addr;
   int rcvbuf = To<int>(info[1]).FromJust();
@@ -293,13 +293,15 @@ NAN_METHOD(udprecv){
   Local<Object> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
 
-  char *ip = ntop(addr);
+  ipaddrstr(addr, ipstr);
 
+  /*  return new JS object with two properties
+   *  • buf: the udp buffer
+   *  • addr: a human readable IP address string of the buffer's origin
+   */
   Local<Object> obj = Nan::New<Object>();
   Nan::Set(obj, New("buf").ToLocalChecked(), h);
-  Nan::Set(obj, New("addr").ToLocalChecked(), New<String>(ip).ToLocalChecked());
-
-  free(ip);
+  Nan::Set(obj, New("addr").ToLocalChecked(), New<String>(ipstr).ToLocalChecked());
 
   info.GetReturnValue().Set(obj);
 }

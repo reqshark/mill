@@ -5,7 +5,7 @@ module.exports = function udp (t) {
 }
 
 function listen (t) {
-  t.plan(5);
+  t.plan(6);
 
   var buf = new Buffer('Hello, world!');
   var size_t = 8;
@@ -21,10 +21,15 @@ function listen (t) {
   var i = 10000;
   var msgs = [];
 
+  /* send and recv 10K udp packets */
   while(i--){
     lib.udpsend(ls, ipaddr, buf);
-    msgs.push(lib.udprecv(ls, 13).buf);
+    var udprecv = lib.udprecv(ls, 13);
+    msgs.push(udprecv.buf);
   }
+
+  /* test ipadrstr on the last inbound udp packet */
+  t.is(udprecv.addr, '127.0.0.1', 'confirmed localhost addrstr: 127.0.0.1');
 
   var bufferLoss = [];
   var validator = String(buf);
@@ -32,6 +37,7 @@ function listen (t) {
 
   t.ok(l, 'total udp msgs sent and recv\'d: ' + ( l/1000 )+'K');
 
+  /* observe any UDP packet loss. expect zero loss over local interface */
   while(l--) if (String(msgs[l]) !== validator)
     bufferLoss.push(msgs[l]);
 
