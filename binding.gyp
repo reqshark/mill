@@ -5,12 +5,23 @@
             'type': 'static_library',
             'conditions': [
                 # gyp cflags don't work on osx
-                ['OS=="linux"', { 'includes': [ 'linux.gypi', ] }],
+                ['OS=="linux"', {
+                    'includes': [
+                        'linux.gypi',
+                    ]
+                }],
+#                ['OS=="linux"', {
+#                    'includes': [
+#                        'mac.gypi',
+#                    ]
+#                }],
             ],
             'include_dirs': [
-                'libmill'
+                'libmill',
+#                'libmill/dns'
             ],
             'sources': [
+#                'libmill/dns/dns.c',
                 'libmill/chan.c',
                 'libmill/cr.c',
                 'libmill/debug.c',

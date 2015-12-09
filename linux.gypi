@@ -13,4 +13,14 @@
         '-D_FORTIFY_SOURCE=0',
         '-DMILL_EXPORTS',
     ],
+    # compiler settings to build the nanomsg library
+    'defines': [
+        'MILL_EPOLL',
+    ],
+    'direct_dependent_settings': {
+        # build nanomsg hub with same compiler flags as the library
+        'defines': [
+            'MILL_EPOLL',
+        ],
+    }
 }
