@@ -3,11 +3,11 @@
   "version":          "0.0.5",
   "description":      "bindings to libmill",
   "dependencies":     {
-    "nan":              "~2.0.9"
+    "nan":              "2.1.0"
   },
   "devDependencies":  {
-    "tape":             "~3.5.0",
-    "tap-spec":         "~2.2.1"
+    "tape":             "3.5",
+    "tap-spec":         "2.2"
   },
   "repository":       {
     "type":             "git",

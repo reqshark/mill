@@ -65,7 +65,7 @@ NAN_METHOD(iplocal){
   int port = 5555;
 
   /* set mode or go with default of zero */
-  int mode = 0;
+  int mode = 1;
   if (info[2]->IsNumber())
     mode = To<int>(info[2]).FromJust();
 
@@ -95,36 +95,20 @@ NAN_METHOD(iplocal){
 }
 
 NAN_METHOD(ipremote){
-  /* default port */
-  int port = 5555;
+  /* port */
+  int port = To<int>(info[1]).FromJust();
 
   /* deadline */
   int64_t deadline = -1;
-  if (info[3]->IsNumber())
-    deadline = now() + To<int64_t>(info[3]).FromJust();
 
-  /* set mode or go with default of zero */
-  int mode = 0;
-  if (info[2]->IsNumber())
-    mode = To<int>(info[2]).FromJust();
+  /* set mode default */
+  int mode = 1;
 
   /* ip address */
-  char *ip = NULL;
-  if (info[0]->IsString()) {
-    String::Utf8Value ip(info[0]);
-    if (info[1]->IsNumber())
-      port = To<int>(info[1]).FromJust();
-  }
-
-  /* check port */
-  if (info[0]->IsNumber()) {
-    port = To<int>(info[0]).FromJust();
-    if (info[1]->IsNumber())
-      mode = To<int>(info[1]).FromJust();
-  }
+  String::Utf8Value ip(info[0]);
 
   /* get an ipaddr */
-  ipaddr ipv = ipremote(ip, port, mode, deadline);
+  ipaddr ipv = ipremote(*ip, port, mode, deadline);
   size_t sz = sizeof(&ipv);
 
   /* create a node buffer pointer */

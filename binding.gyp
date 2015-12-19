@@ -10,18 +10,18 @@
                         'linux.gypi',
                     ]
                 }],
-#                ['OS=="linux"', {
-#                    'includes': [
-#                        'mac.gypi',
-#                    ]
-#                }],
+            ['OS=="mac"', {
+                'includes': [
+                    'mac.gypi',
+                ]
+            }],
             ],
             'include_dirs': [
                 'libmill',
-#                'libmill/dns'
+                'libmill/dns'
             ],
             'sources': [
-#                'libmill/dns/dns.c',
+                'libmill/dns/dns.c',
                 'libmill/chan.c',
                 'libmill/cr.c',
                 'libmill/debug.c',
