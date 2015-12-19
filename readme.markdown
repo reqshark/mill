@@ -3,6 +3,8 @@
 
 go style concurrency for node.
 
+### 0.0.6 is broken on linux at the moment, use 0.0.5 or wait for 0.0.7
+
 an experiment
 
 ```bash
