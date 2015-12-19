@@ -12,6 +12,8 @@
         '-U_FORTIFY_SOURCE',
         '-D_FORTIFY_SOURCE=0',
         '-DMILL_EXPORTS',
+        '-fvisibility=hidden',
+        '-std=gnu99',
     ],
     # compiler settings to build the nanomsg library
     'defines': [

@@ -21,7 +21,6 @@
                 'libmill/dns'
             ],
             'sources': [
-                'libmill/dns/dns.c',
                 'libmill/chan.c',
                 'libmill/cr.c',
                 'libmill/debug.c',
@@ -33,7 +32,8 @@
                 'libmill/tcp.c',
                 'libmill/udp.c',
                 'libmill/unix.c',
-                'libmill/utils.c'
+                'libmill/utils.c',
+                'libmill/dns/dns.c',
             ]
         },
         {
