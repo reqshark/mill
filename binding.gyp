@@ -30,9 +30,10 @@
                 'libmill/slist.c',
                 'libmill/stack.c',
                 'libmill/tcp.c',
+                'libmill/timer.c',
                 'libmill/udp.c',
                 'libmill/unix.c',
-                'libmill/utils.c',
+                'libmill/utils.h',
                 'libmill/dns/dns.c',
             ]
         },
