@@ -51,6 +51,10 @@ extern "C" {
 
 #include "ref.h"
 
+#include "timer.h"
+//#include "utils.h"
+
+
 /******************************************************************************/
 /*  IP address library                                                        */
 /******************************************************************************/
@@ -307,6 +311,21 @@ NAN_METHOD(udpdetach){
   info.GetReturnValue().Set(Nan::New<Number>(fd));
 }
 
+/******************************************************************************/
+/*  UDP library extensions                                                    */
+/******************************************************************************/
+
+//NAN_METHOD(udplistenfd){
+//}
+
+NAN_METHOD (sleep) {
+  int timeo = To<int>( info[0]).FromJust();
+  int ret = sleep( timeo );
+  info.GetReturnValue().Set(ret);
+}
+
+
+
 
 /******************************************************************************/
 /*  UNIX library                                                              */
@@ -461,6 +480,10 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, udpclose);
   EXPORT_METHOD(target, udpattach);
   EXPORT_METHOD(target, udpdetach);
+
+  /* extensions */
+  EXPORT_METHOD(target, sleep);
+  //EXPORT_METHOD(target, udpfd);
 
   /* unix library */
   EXPORT_METHOD(target, unixlisten);

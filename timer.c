@@ -22,4 +22,24 @@
 
 */
 
-module.exports = require('./build/Release/mill.node')
+#include "timer.h"
+
+int reqsleep (int seconds) {
+  int n;
+  int slept;
+  time_t start;
+  time_t stop;
+  struct timeval tv;
+
+  tv.tv_sec = seconds;
+  tv.tv_usec = 0;
+  time(&start);
+  n = select(0, NULL, NULL, NULL, &tv);
+  if (n == 0)
+    return (0);
+  time(&stop);
+  slept = stop - start;
+  if (slept >= seconds)
+    return (0);
+  return (seconds - slept);
+}

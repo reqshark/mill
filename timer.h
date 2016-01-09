@@ -22,4 +22,15 @@
 
 */
 
-module.exports = require('./build/Release/mill.node')
+#ifndef TIMER_INCLUDED
+#define TIMER_INCLUDED
+
+#include <unistd.h>
+#include <time.h>
+#include <sys/select.h>
+
+
+int reqsleep(int seconds);
+
+
+#endif

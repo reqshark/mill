@@ -6,6 +6,7 @@
     "nan":              "2.1.0"
   },
   "devDependencies":  {
+    "datey":            "1.0.1",
     "tape":             "3.5",
     "tap-spec":         "2.2"
   },

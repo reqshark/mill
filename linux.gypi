@@ -1,8 +1,7 @@
 {
     'cflags': [
         #'-g',
-        '-O3',
-        '-Wall', '-Wextra',
+        '-O3', '-Wall', '-Wextra', '-lanl','-lrt',
 
 # get rid of node-gyp noisey warnings:
         '-Wno-unused', '-Wno-sign-compare','-Wno-maybe-uninitialized',
@@ -14,6 +13,8 @@
         '-DMILL_EXPORTS',
         '-fvisibility=hidden',
         '-std=gnu99',
+
+        '-D_GNU_SOURCE',
     ],
     # compiler settings to build the nanomsg library
     'defines': [
