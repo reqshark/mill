@@ -269,7 +269,6 @@ NAN_METHOD(udpsend){
   udpsend(s, addr, node::Buffer::Data(info[2]), node::Buffer::Length(info[2]));
 }
 
-//TODO: deadline
 static char ipstr[IPADDR_MAXSTRLEN];
 NAN_METHOD(udprecv){
   ipaddr addr;
