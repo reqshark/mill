@@ -24,7 +24,7 @@ function listen (t) {
   /* send and recv 10K udp packets */
   while(i--){
     lib.udpsend(ls, ipaddr, buf);
-    var udprecv = lib.udprecv(ls, 13);
+    var udprecv = lib.udprecv(ls, 13, 10);
     msgs.push(udprecv.buf);
   }
 

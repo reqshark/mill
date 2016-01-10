@@ -273,11 +273,12 @@ NAN_METHOD(udpsend){
 static char ipstr[IPADDR_MAXSTRLEN];
 NAN_METHOD(udprecv){
   ipaddr addr;
-  int rcvbuf = To<int>(info[1]).FromJust();
-  char buf[rcvbuf];
-
   udpsock s = UnwrapPointer<udpsock>(info[0]);
-  size_t sz = udprecv(s, &addr, buf, sizeof(buf), -1);
+
+  char buf[To<int>(info[1]).FromJust()];
+  int deadline = now() + To<int>(info[2]).FromJust();
+
+  size_t sz = udprecv(s, &addr, buf, sizeof(buf), deadline);
   Local<Object> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
 
@@ -314,9 +315,6 @@ NAN_METHOD(udpdetach){
 /******************************************************************************/
 /*  UDP library extensions                                                    */
 /******************************************************************************/
-
-//NAN_METHOD(udplistenfd){
-//}
 
 NAN_METHOD (sleep) {
   int timeo = To<int>( info[0]).FromJust();

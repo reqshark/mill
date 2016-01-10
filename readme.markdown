@@ -68,6 +68,7 @@ lib.tcpflush(cs);
 
 # udp library
 ### `udplisten()` and `udprecv()`
+
 ```js
 var lib = require('libmill');
 
@@ -78,8 +79,13 @@ var ipaddr = lib.iplocal(4444);
 var ls = lib.udplisten(ipaddr);
 process.stdout.write('udp socket listening on port: ' + lib.udpport(ls) + '\n');
 
-while(1)
-  process.stdout.write(lib.udprecv(ls, 13) + '\n');
+while(1) {
+  var sz = 13;
+  var deadline = 10;
+
+  var msg = lib.udprecv(ls, sz, deadline); // deadline is optional param
+  process.stdout.write(msg.buf + '\n');
+}
 ```
 
 ### `udpsend()`
