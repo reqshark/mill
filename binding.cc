@@ -50,9 +50,7 @@ extern "C" {
 #include <string.h>
 
 #include "ref.h"
-
-#include "timer.h"
-//#include "utils.h"
+#include "timer.c"
 
 
 /******************************************************************************/

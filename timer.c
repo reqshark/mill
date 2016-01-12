@@ -22,7 +22,8 @@
 
 */
 
-#include "timer.h"
+#include <time.h>
+#include <sys/select.h>
 
 int reqsleep (int seconds) {
   int n;
