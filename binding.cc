@@ -25,6 +25,7 @@
 #include "nan.h"
 
 using v8::FunctionTemplate;
+using v8::Function;
 using v8::Number;
 using v8::Boolean;
 using v8::String;
@@ -32,8 +33,10 @@ using v8::Object;
 using v8::Value;
 using v8::Local;
 
+using Nan::HandleScope;
 using Nan::MaybeLocal;
 using Nan::NewBuffer;
+using Nan::Callback;
 using Nan::Maybe;
 using Nan::New;
 using Nan::To;
@@ -52,6 +55,7 @@ extern "C" {
 #include "ref.h"
 #include "timer.c"
 
+static char ipstr[IPADDR_MAXSTRLEN];
 
 /******************************************************************************/
 /*  IP address library                                                        */
@@ -267,7 +271,6 @@ NAN_METHOD(udpsend){
   udpsend(s, addr, node::Buffer::Data(info[2]), node::Buffer::Length(info[2]));
 }
 
-static char ipstr[IPADDR_MAXSTRLEN];
 NAN_METHOD(udprecv){
   ipaddr addr;
   udpsock s = UnwrapPointer<udpsock>(info[0]);
@@ -314,13 +317,70 @@ NAN_METHOD(udpdetach){
 /******************************************************************************/
 
 NAN_METHOD (sleep) {
-  int timeo = To<int>( info[0]).FromJust();
-  int ret = sleep( timeo );
+  int timeo = To<int>(info[0]).FromJust();
+  int ret = reqsleep( timeo );
   info.GetReturnValue().Set(ret);
 }
 
+struct mill_udpsock {
+  int fd;
+  int port;
+};
 
+typedef struct udp_s {
+  uv_poll_t poll_handle;
+  uv_os_sock_t fd;
+  Callback *cb;
+  int len;
+} udp_t;
 
+void udpRead(uv_poll_t *req, int status, int events) {
+  HandleScope scope;
+
+  if (events & UV_READABLE) {
+    ipaddr addr;
+    ssize_t ss;
+    socklen_t slen = sizeof(ipaddr);
+
+    udp_t *ctx;
+    ctx = reinterpret_cast<udp_t *>(req);
+
+    char buf[ctx->len];
+    ss = recvfrom(ctx->fd, buf, sizeof(buf),0, (struct sockaddr*)&addr, &slen);
+
+    if(ss >= 0) {
+      ipaddrstr(addr, ipstr);
+      Local<Object> obj = Nan::New<Object>();
+      Local<Object> h = NewBuffer(ss).ToLocalChecked();
+      memcpy(node::Buffer::Data(h), buf, ss);
+
+      Nan::Set(obj, New("buf").ToLocalChecked(), h);
+      Nan::Set(obj, New("addr").ToLocalChecked(),
+        New<String>(ipstr).ToLocalChecked());
+
+      Local<Value> argv[] = { obj };
+      ctx->cb->Call(1, argv);
+    }
+  }
+}
+
+NAN_METHOD(udprecva){
+  Callback *cb = new Callback(info[2].As<Function>());
+  udpsock s = UnwrapPointer<udpsock>(info[0]);
+
+  udp_t *context;
+  context = reinterpret_cast<udp_t *>(calloc(1, sizeof(udp_t)));
+  context->poll_handle.data = context;
+  context->cb = cb;
+  context->fd = s->fd;
+  context->len = To<int>(info[1]).FromJust();
+
+  if (context->fd != 0) {
+    uv_poll_init_socket(uv_default_loop(), &context->poll_handle, context->fd);
+    uv_poll_start(&context->poll_handle, UV_READABLE, udpRead);
+    info.GetReturnValue().Set(WrapPointer(context, 8));
+  }
+}
 
 /******************************************************************************/
 /*  UNIX library                                                              */
@@ -478,7 +538,7 @@ NAN_MODULE_INIT(Init) {
 
   /* extensions */
   EXPORT_METHOD(target, sleep);
-  //EXPORT_METHOD(target, udpfd);
+  EXPORT_METHOD(target, udprecva);
 
   /* unix library */
   EXPORT_METHOD(target, unixlisten);
