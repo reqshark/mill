@@ -38,6 +38,7 @@ using Nan::MaybeLocal;
 using Nan::NewBuffer;
 using Nan::Callback;
 using Nan::Maybe;
+using Nan::Set;
 using Nan::New;
 using Nan::To;
 
@@ -142,7 +143,7 @@ NAN_METHOD(tcplisten){
 NAN_METHOD(tcpport){
   tcpsock s = UnwrapPointer<tcpsock>(info[0]);
   int port = tcpport(s);
-  info.GetReturnValue().Set(Nan::New<Number>(port));
+  info.GetReturnValue().Set(New<Number>(port));
 }
 
 NAN_METHOD(tcpaccept){
@@ -288,9 +289,9 @@ NAN_METHOD(udprecv){
    *  • buf: the udp buffer
    *  • addr: a human readable IP address string of the buffer's origin
    */
-  Local<Object> obj = Nan::New<Object>();
-  Nan::Set(obj, New("buf").ToLocalChecked(), h);
-  Nan::Set(obj, New("addr").ToLocalChecked(), New<String>(ipstr).ToLocalChecked());
+  Local<Object> obj = New<Object>();
+  Set(obj, New("buf").ToLocalChecked(), h);
+  Set(obj, New("addr").ToLocalChecked(), New<String>(ipstr).ToLocalChecked());
 
   info.GetReturnValue().Set(obj);
 }
@@ -309,7 +310,7 @@ NAN_METHOD(udpattach){
 NAN_METHOD(udpdetach){
   int fd = udpdetach(UnwrapPointer<udpsock>(info[0]));
   assert(fd != -1);
-  info.GetReturnValue().Set(Nan::New<Number>(fd));
+  info.GetReturnValue().Set(New<Number>(fd));
 }
 
 /******************************************************************************/
@@ -346,19 +347,18 @@ void udpRead(uv_poll_t *req, int status, int events) {
     ctx = reinterpret_cast<udp_t *>(req);
 
     char buf[ctx->len];
-    ss = recvfrom(ctx->fd, buf, sizeof(buf),0, (struct sockaddr*)&addr, &slen);
+    ss = recvfrom(ctx->fd, buf, sizeof(buf), 0, (struct sockaddr*)&addr, &slen);
 
     if(ss >= 0) {
       ipaddrstr(addr, ipstr);
-      Local<Object> obj = Nan::New<Object>();
+      Local<Object> o = New<Object>();
       Local<Object> h = NewBuffer(ss).ToLocalChecked();
       memcpy(node::Buffer::Data(h), buf, ss);
 
-      Nan::Set(obj, New("buf").ToLocalChecked(), h);
-      Nan::Set(obj, New("addr").ToLocalChecked(),
-        New<String>(ipstr).ToLocalChecked());
+      Set(o, New("buf").ToLocalChecked(), h);
+      Set(o, New("addr").ToLocalChecked(), New<String>(ipstr).ToLocalChecked());
 
-      Local<Value> argv[] = { obj };
+      Local<Value> argv[] = { o };
       ctx->cb->Call(1, argv);
     }
   }
@@ -430,7 +430,7 @@ NAN_METHOD(unixsend){
   size_t sz = unixsend(UnwrapPointer<unixsock>(info[0]),
     node::Buffer::Data(info[1]), node::Buffer::Length(info[1]), -1);
 
-  info.GetReturnValue().Set(Nan::New<Number>(sz));
+  info.GetReturnValue().Set(New<Number>(sz));
 }
 
 //TODO: deadline
@@ -483,7 +483,7 @@ NAN_METHOD(unixattach){
 NAN_METHOD(unixdetach){
   int fd = unixdetach(UnwrapPointer<unixsock>(info[0]));
   assert(fd != -1);
-  info.GetReturnValue().Set(Nan::New<Number>(fd));
+  info.GetReturnValue().Set(New<Number>(fd));
 }
 
 NAN_METHOD(goredump){ goredump(); };
@@ -504,11 +504,11 @@ NAN_METHOD(test){
 }
 
 #define EXPORT_METHOD(C, S)                                                    \
-  Nan::Set(C, Nan::New(#S).ToLocalChecked(),                                   \
-    Nan::GetFunction(Nan::New<FunctionTemplate>(S)).ToLocalChecked());
+  Set(C, New(#S).ToLocalChecked(),                                   \
+    Nan::GetFunction(New<FunctionTemplate>(S)).ToLocalChecked());
 
 NAN_MODULE_INIT(Init) {
-  Nan::HandleScope scope;
+  HandleScope scope;
 
   /* ip resolution */
   EXPORT_METHOD(target, iplocal);

@@ -79,11 +79,21 @@ var ipaddr = lib.iplocal(4444);
 var ls = lib.udplisten(ipaddr);
 process.stdout.write('udp socket listening on port: ' + lib.udpport(ls) + '\n');
 
-while(1) {
+/* next, to get udp msgs, use udprecv or udprecva */
+
+
+/* the non-blocking way (a for async) */
+lib.udprecva(ls, 255, function (msg) {
+  var buf = String(msg.buf) /* msg.buf is a node buffer of the packet body */
+  var addr = msg.addr  /* string address of packet origin */
+});
+
+/* the blocking way  */
+while (1) {
   var sz = 13;
   var deadline = 10;
 
-  var msg = lib.udprecv(ls, sz, deadline); // deadline is optional param
+  var msg = lib.udprecv(ls, sz, deadline); /* deadline is optional param */
   process.stdout.write(msg.buf + '\n');
 }
 ```
