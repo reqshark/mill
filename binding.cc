@@ -1,6 +1,7 @@
 /*
 
   Copyright (c) 2015-2016 Bent Cardan
+  Copyright (c) 2015 Martin Sustrik
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"),
@@ -128,6 +129,98 @@ NAN_METHOD(ipremote){
 /*  TCP library                                                               */
 /******************************************************************************/
 
+/* The buffer size is based on typical Ethernet MTU (1500 bytes). Making it
+   smaller would yield small suboptimal packets. Making it higher would bring
+   no substantial benefit. The value is made smaller to account for IPv4/IPv6
+   and TCP headers. Few more bytes are subtracted to account for any possible
+   IP or TCP options */
+#ifndef TCP_BUFLEN
+#define TCP_BUFLEN (1500 - 68)
+#endif
+
+enum mill_tcptype {
+  MILL_TCPLISTENER,
+  MILL_TCPCONN
+};
+
+struct mill_tcpsock {
+  enum mill_tcptype type;
+};
+
+struct mill_tcplistener {
+  struct mill_tcpsock sock;
+  int fd;
+  int port;
+};
+
+struct mill_tcpconn {
+  struct mill_tcpsock sock;
+  int fd;
+  size_t ifirst;
+  size_t ilen;
+  size_t olen;
+  char ibuf[TCP_BUFLEN];
+  char obuf[TCP_BUFLEN];
+  ipaddr addr;
+};
+
+typedef struct tcp_s {
+  uv_poll_t poll_handle;
+  uv_os_sock_t fd;
+  Callback *cb;
+} tcp_t;
+
+static void tcptune(int s) {
+  /* Make the socket non-blocking. */
+  int opt = fcntl(s, F_GETFL, 0);
+  if (opt == -1)
+      opt = 0;
+  int rc = fcntl(s, F_SETFL, opt | O_NONBLOCK);
+  assert(rc != -1);
+  /*  Allow re-using the same local address rapidly. */
+  opt = 1;
+  rc = setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof (opt));
+  assert(rc == 0);
+  /* If possible, prevent SIGPIPE signal when writing to the connection
+      already closed by the peer. */
+#ifdef SO_NOSIGPIPE
+  opt = 1;
+  rc = setsockopt (s, SOL_SOCKET, SO_NOSIGPIPE, &opt, sizeof (opt));
+  assert (rc == 0 || errno == EINVAL);
+#endif
+}
+
+static void tcpconn_init(struct mill_tcpconn *conn, int fd) {
+  conn->sock.type = MILL_TCPCONN;
+  conn->fd = fd;
+  conn->ifirst = 0;
+  conn->ilen = 0;
+  conn->olen = 0;
+}
+
+void tcpAccept(uv_poll_t *req, int status, int events) {
+  HandleScope scope;
+  if (events & UV_READABLE) {
+    ipaddr addr;
+    socklen_t slen = sizeof(ipaddr);
+
+    tcp_t *ctx;
+    ctx = reinterpret_cast<tcp_t *>(req);
+
+    int as = accept(ctx->fd, (struct sockaddr *)&addr, &slen);
+    tcptune(as);
+
+    size_t sz = sizeof(struct mill_tcpconn);
+    struct mill_tcpconn *conn = (struct mill_tcpconn *)malloc(sz);
+    tcpconn_init(conn, as);
+    assert(conn);
+    conn->addr = addr;
+
+    Local<Value> argv[] = { WrapPointer((tcpsock)conn, sizeof(mill_tcpconn)) };
+    ctx->cb->Call(1, argv);
+  }
+}
+
 NAN_METHOD(tcplisten){
   /* backlog settings */
   int backlog = 10;
@@ -147,14 +240,35 @@ NAN_METHOD(tcpport){
 }
 
 NAN_METHOD(tcpaccept){
+
+  tcpsock s = UnwrapPointer<tcpsock>(info[0]);
+
   /* deadline */
   int64_t deadline = -1;
   if (info[1]->IsNumber())
     deadline = now() + To<int64_t>(info[1]).FromJust();
 
-  tcpsock as = tcpaccept(UnwrapPointer<tcpsock>(info[0]), deadline);
-  assert(as);
-  info.GetReturnValue().Set(WrapPointer(as, sizeof(&as)));
+  if (info[1]->IsFunction()) {
+    if(s->type != MILL_TCPLISTENER)
+      abort(); // abort trap! trying to pass non-listening socks..
+    struct mill_tcplistener *l = (struct mill_tcplistener*)s;
+
+    Callback *cb = new Callback(info[1].As<Function>());
+    tcp_t *ctx;
+    ctx = reinterpret_cast<tcp_t *>(calloc(1, sizeof(tcp_t)));
+    ctx->poll_handle.data = ctx;
+    ctx->cb = cb;
+    ctx->fd = l->fd;
+
+    uv_poll_init_socket(uv_default_loop(), &ctx->poll_handle, ctx->fd);
+    uv_poll_start(&ctx->poll_handle, UV_READABLE, tcpAccept);
+
+    info.GetReturnValue().Set(WrapPointer(ctx, 8));
+  } else {
+    tcpsock as = tcpaccept(s, deadline);
+    assert(as);
+    info.GetReturnValue().Set(WrapPointer(as, sizeof(&as)));
+  }
 }
 
 NAN_METHOD(tcpconnect){
