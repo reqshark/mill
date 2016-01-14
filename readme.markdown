@@ -79,11 +79,15 @@ var ipaddr = lib.iplocal(4444);
 var ls = lib.udplisten(ipaddr);
 process.stdout.write('udp socket listening on port: ' + lib.udpport(ls) + '\n');
 
-/* next, to get udp msgs, use udprecv or udprecva */
+/* next, to get udp msgs, use udprecv
+   if you pass a cb function as the 3rd param, the call will use libuv async
+   the callback's param will contain your msg
+
+   otherwise w/out a cb, it will block and udprecv's return value is your msg */
 
 
 /* the non-blocking way (a for async) */
-lib.udprecva(ls, 255, function (msg) {
+lib.udprecv(ls, 255, function (msg) {
   var buf = String(msg.buf) /* msg.buf is a node buffer of the packet body */
   var addr = msg.addr  /* string address of packet origin */
 });

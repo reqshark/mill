@@ -368,75 +368,6 @@ NAN_METHOD(tcpdetach){
 /******************************************************************************/
 /*  UDP library                                                               */
 /******************************************************************************/
-
-NAN_METHOD(udplisten){
-  udpsock s = udplisten(*UnwrapPointer<ipaddr*>(info[0]));
-  assert(s);
-  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
-}
-
-NAN_METHOD(udpport){
-  int port = udpport(UnwrapPointer<udpsock>(info[0]));
-  info.GetReturnValue().Set(New<Number>(port));
-}
-
-NAN_METHOD(udpsend){
-  udpsock s = UnwrapPointer<udpsock>(info[0]);
-  ipaddr addr = *UnwrapPointer<ipaddr*>(info[1]);
-  udpsend(s, addr, node::Buffer::Data(info[2]), node::Buffer::Length(info[2]));
-}
-
-NAN_METHOD(udprecv){
-  ipaddr addr;
-  udpsock s = UnwrapPointer<udpsock>(info[0]);
-
-  char buf[To<int>(info[1]).FromJust()];
-  int deadline = now() + To<int>(info[2]).FromJust();
-
-  size_t sz = udprecv(s, &addr, buf, sizeof(buf), deadline);
-  Local<Object> h = NewBuffer(sz).ToLocalChecked();
-  memcpy(node::Buffer::Data(h), buf, sz);
-
-  ipaddrstr(addr, ipstr);
-
-  /*  return new JS object with two properties
-   *  • buf: the udp buffer
-   *  • addr: a human readable IP address string of the buffer's origin
-   */
-  Local<Object> obj = New<Object>();
-  Set(obj, New("buf").ToLocalChecked(), h);
-  Set(obj, New("addr").ToLocalChecked(), New<String>(ipstr).ToLocalChecked());
-
-  info.GetReturnValue().Set(obj);
-}
-
-NAN_METHOD(udpclose){
-  udpclose(UnwrapPointer<udpsock>(info[0]));
-}
-
-NAN_METHOD(udpattach){
-  int fd = To<int>(info[0]).FromJust();
-  udpsock s = udpattach(fd);
-  assert(s);
-  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
-}
-
-NAN_METHOD(udpdetach){
-  int fd = udpdetach(UnwrapPointer<udpsock>(info[0]));
-  assert(fd != -1);
-  info.GetReturnValue().Set(New<Number>(fd));
-}
-
-/******************************************************************************/
-/*  UDP library extensions                                                    */
-/******************************************************************************/
-
-NAN_METHOD (sleep) {
-  int timeo = To<int>(info[0]).FromJust();
-  int ret = reqsleep( timeo );
-  info.GetReturnValue().Set(ret);
-}
-
 struct mill_udpsock {
   int fd;
   int port;
@@ -478,22 +409,91 @@ void udpRead(uv_poll_t *req, int status, int events) {
   }
 }
 
-NAN_METHOD(udprecva){
-  Callback *cb = new Callback(info[2].As<Function>());
+NAN_METHOD(udplisten){
+  udpsock s = udplisten(*UnwrapPointer<ipaddr*>(info[0]));
+  assert(s);
+  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
+}
+
+NAN_METHOD(udpport){
+  int port = udpport(UnwrapPointer<udpsock>(info[0]));
+  info.GetReturnValue().Set(New<Number>(port));
+}
+
+NAN_METHOD(udpsend){
   udpsock s = UnwrapPointer<udpsock>(info[0]);
+  ipaddr addr = *UnwrapPointer<ipaddr*>(info[1]);
+  udpsend(s, addr, node::Buffer::Data(info[2]), node::Buffer::Length(info[2]));
+}
 
-  udp_t *context;
-  context = reinterpret_cast<udp_t *>(calloc(1, sizeof(udp_t)));
-  context->poll_handle.data = context;
-  context->cb = cb;
-  context->fd = s->fd;
-  context->len = To<int>(info[1]).FromJust();
+NAN_METHOD(udprecv){
+  ipaddr addr;
+  int len = To<int>(info[1]).FromJust();
+  udpsock s = UnwrapPointer<udpsock>(info[0]);  
 
-  if (context->fd != 0) {
-    uv_poll_init_socket(uv_default_loop(), &context->poll_handle, context->fd);
-    uv_poll_start(&context->poll_handle, UV_READABLE, udpRead);
-    info.GetReturnValue().Set(WrapPointer(context, 8));
+  if (info[2]->IsFunction()) {
+    Callback *cb = new Callback(info[2].As<Function>());
+    udpsock s = UnwrapPointer<udpsock>(info[0]);
+
+    udp_t *context;
+    context = reinterpret_cast<udp_t *>(calloc(1, sizeof(udp_t)));
+    context->poll_handle.data = context;
+    context->cb = cb;
+    context->fd = s->fd;
+    context->len = len;
+
+    if (context->fd != 0) {
+      uv_poll_init_socket(uv_default_loop(), &context->poll_handle, context->fd);
+      uv_poll_start(&context->poll_handle, UV_READABLE, udpRead);
+      info.GetReturnValue().Set(WrapPointer(context, 8));
+    }
+  } else {
+    char buf[len];
+    int deadline = now() + To<int>(info[2]).FromJust();
+
+    size_t sz = udprecv(s, &addr, buf, sizeof(buf), deadline);
+    Local<Object> h = NewBuffer(sz).ToLocalChecked();
+    memcpy(node::Buffer::Data(h), buf, sz);
+
+    ipaddrstr(addr, ipstr);
+
+    /*  return new JS object with two properties
+     *  • buf: the udp buffer
+     *  • addr: a human readable IP address string of the buffer's origin
+     */
+    Local<Object> obj = New<Object>();
+    Set(obj, New("buf").ToLocalChecked(), h);
+    Set(obj, New("addr").ToLocalChecked(), New<String>(ipstr).ToLocalChecked());
+
+    info.GetReturnValue().Set(obj);
   }
+}
+
+NAN_METHOD(udpclose){
+  udpclose(UnwrapPointer<udpsock>(info[0]));
+}
+
+NAN_METHOD(udpattach){
+  int fd = To<int>(info[0]).FromJust();
+  udpsock s = udpattach(fd);
+  assert(s);
+  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
+}
+
+NAN_METHOD(udpdetach){
+  int fd = udpdetach(UnwrapPointer<udpsock>(info[0]));
+  assert(fd != -1);
+  info.GetReturnValue().Set(New<Number>(fd));
+}
+
+/******************************************************************************/
+/*  UDP library extensions                                                    */
+/******************************************************************************/
+
+NAN_METHOD (sleep) {
+  int timeo = To<int>(info[0]).FromJust();
+  int ret = reqsleep( timeo );
+  info.GetReturnValue().Set(ret);
 }
 
 /******************************************************************************/
@@ -652,7 +652,6 @@ NAN_MODULE_INIT(Init) {
 
   /* extensions */
   EXPORT_METHOD(target, sleep);
-  EXPORT_METHOD(target, udprecva);
 
   /* unix library */
   EXPORT_METHOD(target, unixlisten);
