@@ -3,7 +3,7 @@
   'xcode_settings': {
       'OTHER_CFLAGS': [
           '-g', # debug
-          '-O2', # setting to -02 or -O3, but ./configure wants '-O0'
+          '-O0',
           '-fvisibility=hidden',
           '-DMILL_EXPORTS',
           '-U_FORTIFY_SOURCE',
