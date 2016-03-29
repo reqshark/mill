@@ -11,7 +11,7 @@ module.exports = function tcp (t) {
 
 function listen (t) {
   t.plan(2);
-  size_t = 8;
+  size_t = process.arch == 'arm' ? 4 : 8;
   ipaddr = lib.iplocal(44444);
   ls = lib.tcplisten(ipaddr);
 

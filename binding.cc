@@ -94,7 +94,7 @@ NAN_METHOD(iplocal){
 
   /* get an ipaddr */
   ipaddr ipv = iplocal(ip, port, mode);
-  size_t sz = sizeof(&ipv);
+  size_t sz = sizeof (ipaddr);
 
   /* return a libmill ipaddr as a node buffer pointer */
   Local<Object> addr = NewBuffer(sz).ToLocalChecked();
@@ -117,7 +117,7 @@ NAN_METHOD(ipremote){
 
   /* get an ipaddr */
   ipaddr ipv = ipremote(*ip, port, mode, deadline);
-  size_t sz = sizeof(&ipv);
+  size_t sz = sizeof (ipaddr);
 
   /* create a node buffer pointer */
   Local<Object> addr = NewBuffer(sz).ToLocalChecked();
@@ -230,7 +230,7 @@ NAN_METHOD(tcplisten){
   /* dereference and pass ipaddr buffer to tcplisten */
   tcpsock ls = tcplisten(*UnwrapPointer<ipaddr*>(info[0]), backlog);
   assert(ls);
-  info.GetReturnValue().Set(WrapPointer(ls, sizeof(&ls)));
+  info.GetReturnValue().Set(WrapPointer(ls, sizeof(tcpsock)));
 }
 
 NAN_METHOD(tcpport){
@@ -263,7 +263,7 @@ NAN_METHOD(tcpaccept){
     uv_poll_init_socket(uv_default_loop(), &ctx->poll_handle, ctx->fd);
     uv_poll_start(&ctx->poll_handle, UV_READABLE, tcpAccept);
 
-    info.GetReturnValue().Set(WrapPointer(ctx, 8));
+    info.GetReturnValue().Set(WrapPointer(ctx, sizeof(tcp_t)));
   } else {
     tcpsock as = tcpaccept(s, deadline);
     assert(as);
@@ -280,7 +280,7 @@ NAN_METHOD(tcpconnect){
   /* pass an ipremote buffer to tcpconnect */
   tcpsock cs = tcpconnect(*UnwrapPointer<ipaddr*>(info[0]), deadline);
   assert(cs);
-  info.GetReturnValue().Set(WrapPointer(cs, sizeof(&cs)));
+  info.GetReturnValue().Set(WrapPointer(cs, sizeof(tcpsock)));
 }
 
 NAN_METHOD(tcpsend){
@@ -394,7 +394,7 @@ void udpRead(uv_poll_t *req, int status, int events) {
 NAN_METHOD(udplisten){
   udpsock s = udplisten(*UnwrapPointer<ipaddr*>(info[0]));
   assert(s);
-  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
+  info.GetReturnValue().Set(WrapPointer(s, sizeof(udpsock)));
 }
 
 NAN_METHOD(udpport){

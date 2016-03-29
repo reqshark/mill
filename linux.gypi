@@ -13,7 +13,6 @@
         '-DMILL_EXPORTS',
         '-fvisibility=hidden',
         '-std=gnu99',
-
         '-D_GNU_SOURCE',
     ],
     # compiler settings to build the nanomsg library

@@ -8,7 +8,7 @@ function listen (t) {
   t.plan(6);
 
   var buf = new Buffer('Hello, world!');
-  var size_t = 8;
+  var size_t = process.arch == 'arm' ? 4 : 8;
   var port = 44444;
 
   var ipaddr = lib.iplocal(port);

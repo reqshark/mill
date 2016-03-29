@@ -1,6 +1,6 @@
 var lib         = require('..');
 var isBuffer    = Buffer.isBuffer;
-var size_t      = 8;
+var size_t      = 32;
 
 module.exports  = ipaddr;
 
