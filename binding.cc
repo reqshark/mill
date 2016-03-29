@@ -347,24 +347,6 @@ NAN_METHOD(tcpclose){
   tcpclose(UnwrapPointer<tcpsock>(info[0]));
 }
 
-NAN_METHOD(tcpattach){
-  int fd = To<int>(info[0]).FromJust();
-  int listening = To<int>(info[1]).FromJust();
-
-  tcpsock s = tcpattach(fd, listening);
-
-  if (!s)
-    perror("attach error");
-
-  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
-}
-
-NAN_METHOD(tcpdetach){
-  int fd = tcpdetach(UnwrapPointer<tcpsock>(info[0]));
-  assert(fd != -1);
-  info.GetReturnValue().Set(New<Number>(fd));
-}
-
 /******************************************************************************/
 /*  UDP library                                                               */
 /******************************************************************************/
@@ -429,7 +411,7 @@ NAN_METHOD(udpsend){
 NAN_METHOD(udprecv){
   ipaddr addr;
   int len = To<int>(info[1]).FromJust();
-  udpsock s = UnwrapPointer<udpsock>(info[0]);  
+  udpsock s = UnwrapPointer<udpsock>(info[0]);
 
   if (info[2]->IsFunction()) {
     Callback *cb = new Callback(info[2].As<Function>());
@@ -471,19 +453,6 @@ NAN_METHOD(udprecv){
 
 NAN_METHOD(udpclose){
   udpclose(UnwrapPointer<udpsock>(info[0]));
-}
-
-NAN_METHOD(udpattach){
-  int fd = To<int>(info[0]).FromJust();
-  udpsock s = udpattach(fd);
-  assert(s);
-  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
-}
-
-NAN_METHOD(udpdetach){
-  int fd = udpdetach(UnwrapPointer<udpsock>(info[0]));
-  assert(fd != -1);
-  info.GetReturnValue().Set(New<Number>(fd));
 }
 
 /******************************************************************************/
@@ -584,22 +553,6 @@ NAN_METHOD(unixclose){
   unixclose(UnwrapPointer<unixsock>(info[0]));
 }
 
-NAN_METHOD(unixattach){
-  int fd = To<int>(info[0]).FromJust();
-  int listening = To<int>(info[1]).FromJust();
-
-  unixsock s = unixattach(fd, listening);
-  assert(s);
-
-  info.GetReturnValue().Set(WrapPointer(s, sizeof(&s)));
-}
-
-NAN_METHOD(unixdetach){
-  int fd = unixdetach(UnwrapPointer<unixsock>(info[0]));
-  assert(fd != -1);
-  info.GetReturnValue().Set(New<Number>(fd));
-}
-
 NAN_METHOD(goredump){ goredump(); };
 NAN_METHOD(gotrace) { gotrace(1); };
 
@@ -636,8 +589,6 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, tcpflush);
   EXPORT_METHOD(target, tcprecv);
   EXPORT_METHOD(target, tcprecvuntil);
-  EXPORT_METHOD(target, tcpattach);
-  EXPORT_METHOD(target, tcpdetach);
   EXPORT_METHOD(target, tcpport);
   EXPORT_METHOD(target, tcpclose);
 
@@ -647,8 +598,6 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, udpsend);
   EXPORT_METHOD(target, udprecv);
   EXPORT_METHOD(target, udpclose);
-  EXPORT_METHOD(target, udpattach);
-  EXPORT_METHOD(target, udpdetach);
 
   /* extensions */
   EXPORT_METHOD(target, sleep);
@@ -663,8 +612,6 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, unixrecv);
   EXPORT_METHOD(target, unixrecvuntil);
   EXPORT_METHOD(target, unixclose);
-  EXPORT_METHOD(target, unixattach);
-  EXPORT_METHOD(target, unixdetach);
 
   /* debug */
   EXPORT_METHOD(target, gotrace);
