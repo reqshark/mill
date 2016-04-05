@@ -40,13 +40,13 @@
     {
         'target_name': 'mill',
         'dependencies': [
-            "<(module_root_dir)/libsodium.gyp:libsodium", 'libmill',
+            "<(module_root_dir)/libsodium.gyp:libsodium", 'libmill'
         ],
         'conditions': [ ['OS=="linux"', { 'libraries': [ '-lanl','-lrt' ] }]],
         'include_dirs': [
-            "<!(node -e \"require('nan')\")",
             'libmill',
             'libsodium/src/libsodium/include',
+            "<!(node -e \"require('nan')\")",
         ],
         'sources': [ 'binding.cc' ],
     }

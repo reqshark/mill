@@ -17,8 +17,7 @@
   },
   "scripts":          {
     "test":             "node test | tap-spec",
-    "preinstall":       "make",
-    "install":          "node-gyp rebuild"
+    "preinstall":       "make"
   },
   "homepage":         "http://req.link",
   "keywords":         [

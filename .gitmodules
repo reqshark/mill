@@ -3,4 +3,4 @@
 	url = https://github.com/sustrik/libmill
 [submodule "libsodium"]
 	path = libsodium
-	url = git@github.com:jedisct1/libsodium.git
+	url = https://github.com/jedisct1/libsodium

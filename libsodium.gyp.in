@@ -18,7 +18,7 @@
             'xcode_settings': {
                 'OTHER_CFLAGS': [
                         '-D_FORTIFY_SOURCE=2',
-                        '-lintl',
+                        #'-lintl',
                         '-maes',
                         '-mpclmul',
                         '-mavx',
