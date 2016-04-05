@@ -1,8 +1,19 @@
 .PHONY: clean check test
 
-ALL:
+ALL: sodium
+
+configure:
 	git submodule update --init
-	npm i
+	@cd libsodium; ./autogen.sh
+	@cd libsodium; ./configure
+	@node defines.js
+
+sodium:
+    ifeq (,$(wildcard libsodium.gyp))
+	@echo Running make configure
+	@make configure
+    endif
+	@node_modules/node-gyp/bin/node-gyp.js rebuild
 
 check:
 	npm test
