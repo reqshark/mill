@@ -1,17 +1,15 @@
 .PHONY: clean check test
 
-ALL: sodium
+ALL: loop
 
 configure:
 	git submodule update --init
-	@cd libsodium; ./autogen.sh
-	@cd libsodium; ./configure
+	@cd libsodium; ./autogen.sh && ./configure
 	@node defines.js
 
-sodium:
+loop:
 	@npm i nan node-gyp
     ifeq (,$(wildcard libsodium.gyp))
-	@echo Running make configure
 	@make configure
     endif
 	@node_modules/node-gyp/bin/node-gyp.js rebuild
