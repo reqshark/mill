@@ -14,7 +14,7 @@ sodium:
 	@echo Running make configure
 	@make configure
     endif
-	@node-gyp rebuild
+	@node_modules/node-gyp/bin/node-gyp.js rebuild
 
 check:
 	npm test
