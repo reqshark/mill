@@ -1,4 +1,4 @@
-# build and test [![Build Status](https://travis-ci.org/reqshark/mill.svg?branch=master)](https://travis-ci.org/reqshark/mill)
+# build and test [![Build Status](https://circleci.com/gh/reqshark/mill/tree/master.svg?style=svg)](https://circleci.com/gh/reqshark/mill/tree/master)
 
 `test/index.js` file runs the tests by iterating over the required contents
 within this directory.
