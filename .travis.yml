@@ -1,0 +1,50 @@
+sudo: false
+
+language: c
+
+os:
+  - osx
+  - linux
+
+compiler:
+  - gcc
+  - clang
+
+env:
+  matrix:
+    - v=4
+    - v=5
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libc6-dev
+      - pkg-config
+      - libtool
+      - autoconf
+      - automake
+      - gcc-4.9
+      - g++-4.9
+      - clang
+      - libssl-dev
+
+branches:
+  only:
+    - master
+
+before_install:
+  - nvm --version
+  - nvm i $v
+  - node -v
+  - pwd
+
+install:
+  - npm i
+
+script:
+  - npm t
+
+notifications:
+  email: false
