@@ -4,19 +4,18 @@
 within this directory.
 
 from the root directory the process is launched by node test piped to tap-spec.
-```js
-$ node test | tap-spec
+```sh
+$ node test | node_modules/tap-spec/bin/cmd.js
 ```
 
 there are also some convenience operations via make:
 ```bash
+$ rm -rf mill
 $ git clone https://github.com/reqshark/mill.git && cd mill
-$ make clean && make && make check
-```
-
-these commands are respectively:
-```bash
+$ make
+$ make check
 $ make clean
-$ npm i
-$ npm t
+$ npm i && npm t
+$ make build
+$ make test # alias of make check
 ```

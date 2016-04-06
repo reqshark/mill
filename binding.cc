@@ -466,7 +466,7 @@ NAN_METHOD(udpclose){
 
 NAN_METHOD (sleep) {
   int timeo = To<int>(info[0]).FromJust();
-  int ret = reqsleep( timeo );
+  int ret = rsleep( timeo );
   info.GetReturnValue().Set(ret);
 }
 
@@ -629,6 +629,7 @@ NAN_MODULE_INIT(Init) {
   /* sodium */
   EXPORT_METHOD(target, nstr);
   EXPORT_METHOD(target, box_primitive);
+
 }
 
 NODE_MODULE(mill, Init)

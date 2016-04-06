@@ -1,17 +1,17 @@
 module.exports  = sodium
 
 function sodium (t) {
-  t.test('nbuf', nbuf)
-  t.test('socket buffer integrity check', socketbuffers)
-  t.test('print crypto box primitive', box_primitive)
+  t.test( 'nbuf', nbuf )
+  t.test( 'socket buffer integrity check', socketbuffers )
+  t.test( 'print crypto box primitive', box_primitive )
 }
 
 function nbuf (t) {
   t.plan(2)
 
-  var nonce = t.lib.nstr()
-  t.ok( nonce,   `nonce hex: ${nonce}` );
-  t.is( nonce.length,  48, `nonce hex length: ${nonce.length}`   );
+  var nonce     = t.lib.nstr()
+  t.ok( nonce,   `nonce hex: ${nonce}` )
+  t.is( nonce.length,  48, `nonce hex length: ${nonce.length}`   )
 }
 
 function socketbuffers (t) {

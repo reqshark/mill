@@ -1,6 +1,6 @@
 sudo: false
 
-language: c++
+language: c
 
 os:
   - osx
@@ -35,11 +35,11 @@ branches:
     - master
 
 before_install:
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CC=gcc-4.9 && export CXX=g++-4.9; fi
   - gcc -v
   - g++ -v
   - nvm i $v
   - node -v
-  - pwd
 
 install:
   - npm i

@@ -25,7 +25,14 @@
 #include <time.h>
 #include <sys/select.h>
 
-int reqsleep (int seconds) {
+//static struct timeval tv;
+//static unsigned long long milliseconds(){
+//  gettimeofday(&tv, NULL);
+//  return (unsigned long long)(tv.tv_sec) * 1000 +
+//    (unsigned long long)(tv.tv_usec) / 1000;
+//}
+
+int rsleep (int seconds) {
   int n;
   int slept;
   time_t start;
