@@ -58,6 +58,8 @@ extern "C" {
 #include "ref.h"
 #include "timer.c"
 
+#include "crypto.h"
+
 static char ipstr[IPADDR_MAXSTRLEN];
 
 /******************************************************************************/
@@ -290,8 +292,14 @@ NAN_METHOD(tcpsend){
   if (info[2]->IsNumber())
     deadline = now() + To<int64_t>(info[2]).FromJust();
 
+  tcpsock s = UnwrapPointer<tcpsock>(info[0]);
+
+  if ()
+
   size_t sz = tcpsend(UnwrapPointer<tcpsock>(info[0]),
-    node::Buffer::Data(info[1]), node::Buffer::Length(info[1]), deadline);
+                      node::Buffer::Data(info[1]),
+                      node::Buffer::Length(info[1]),
+                      deadline);
 
   info.GetReturnValue().Set(New<Number>(sz));
 }
@@ -578,6 +586,9 @@ NAN_METHOD(test){
 NAN_MODULE_INIT(Init) {
   HandleScope scope;
 
+  if (sodium_init() == -1)
+    abort();
+
   /* ip resolution */
   EXPORT_METHOD(target, iplocal);
   EXPORT_METHOD(target, ipremote);
@@ -618,6 +629,9 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, gotrace);
   EXPORT_METHOD(target, goredump);
   EXPORT_METHOD(target, test);
+
+  /* sodium */
+  EXPORT_METHOD(target, nstr);
 }
 
 NODE_MODULE(mill, Init)
