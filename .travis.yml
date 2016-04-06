@@ -12,8 +12,8 @@ compiler:
 
 env:
   matrix:
-    - v=4
-    - v=5
+    - export v="4"
+    - export v="5"
 
 dist: trusty
 
