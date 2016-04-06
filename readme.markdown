@@ -12,8 +12,11 @@ $ npm i libmill
 $ git clone https://github.com/reqshark/mill.git && cd mill
 $ npm i && npm t
 
-# or start over with:
+# blow away the build, node_modules and lib*.gyp with:
 $ make clean
+
+# run `node-gyp build` to recompile just a change to the source
+$ make build
 ```
 
 # tcp library
@@ -115,4 +118,4 @@ see [`test` directory](test)
 
 MIT
 
-<sub>*tested on travis linux and osx.*</sub>
+<sub>*tested on circleci linux and osx.*</sub>

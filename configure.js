@@ -18,11 +18,11 @@ const readFile      = require('fs').readFile
   'libsodium',
   'libmill'
 ].map(lib => {
-  readFile(lib + '/config.log', 'utf8', (err, l) => {
+  readFile(`${lib}/config.log`, 'utf8', (err, l) => {
     var f = l.split(/## Output variables. ##/)[1].split(/## confdefs.h. ##/)
 
     var gyp = readFileSync('gyp.am', 'utf8')
-    var gypi = require('./' + lib + '.gypi')
+    var gypi = require(`./${lib}.gypi`)
     for (var i in gypi) {
       var I = i.toUpperCase()
       var reg = new RegExp('\\{'+I+'\\}', 'gi')
@@ -46,14 +46,14 @@ const readFile      = require('fs').readFile
     gyp = gyp.replace(/{CFLAGS}/g, (s[1] ? s[1] : '') + cflags(f[0]) )
     gyp = gyp.replace(/{DEFINES}/g, defs(f[1]))
 
-    writeFile ( lib + '.gyp', gyp )
+    writeFile (`${lib}.gyp`, gyp )
   })
 })
 
 function sources (o) {
   var src = readdirSync(o), dir = {}
   if (src.filter(i => i === 'src').length) {
-    dir.path = o + '/src'
+    dir.path = `${o}/src`
     src = readdirSync(dir.path)
   } else {
     dir.path = o
@@ -64,13 +64,13 @@ function sources (o) {
 
 function make (dir) {
   if (dir.src.filter(i => i === 'Makefile.am').length) {
-    var file = readFileSync(dir.path + '/Makefile.am', 'utf8')
+    var file = readFileSync(`${dir.path}/Makefile.am`, 'utf8')
     var subdirs = file.match(/SUBDIRS/)
     if (subdirs) {
       var f = file.match(/\S+$/gm)
       f.shift()
-      dir.path += '/' + f
-      file = readFileSync(dir.path + '/Makefile.am', 'utf8')
+      dir.path += `/${f}`
+      file = readFileSync(`${dir.path}/Makefile.am`, 'utf8')
     }
     return readMakefile(file, dir.path)
   }
@@ -111,12 +111,12 @@ function readMakefile (f, root) {
 
 function includes (lib) {
   var ret = '\'' + lib + '\''
-  var f = readFileSync(lib + '/configure.ac', 'utf8').split(/AC_CONFIG_FILES/)
+  var f = readFileSync(`${lib}/configure.ac`, 'utf8').split(/AC_CONFIG_FILES/)
   if (f.length-1) {
     var line = f[1].match(/(\S.*?)include/gm)
     if (line) {
-      ret += ', \'' + lib + '/' + line[0] + '\''
-      ret += ', \'' + lib + '/' + line[0] + '/' + lib.slice(3) + '\''
+      ret += `,'${lib}/${line[0]}'`
+      ret += `,'${lib}/${line[0]}/${lib.slice(3)}'`
     }
   }
   return ret
