@@ -10,11 +10,10 @@ $ npm i libmill
 
 # or
 $ git clone https://github.com/reqshark/mill.git && cd mill
-$ git submodule update --init
 $ npm i && npm t
 
-# or build with:
-$ make
+# or start over with:
+$ make clean
 ```
 
 # tcp library
