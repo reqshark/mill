@@ -10,7 +10,7 @@
         'conditions': [ ['OS=="linux"', { 'libraries': [ '-lanl','-lrt' ] }]],
         'include_dirs': [
             'libmill',
-            'libsodium/src/libsodium/include/sodium',
+            'libsodium/src/libsodium/include',
             "<!(node -e \"require('nan')\")",
         ],
         'sources': [ 'binding.cc' ],
