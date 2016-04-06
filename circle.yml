@@ -1,7 +1,14 @@
 dependencies:
   pre:
+    - nvm use --delete-prefix v4.2.6 --silent
     - nvm unload
     - rm -rf ~/.nvm ~/.npm ~/.bower
     - git clone https://github.com/creationix/nvm.git ~/.nvm
     - source ~/.nvm/nvm.sh
     - nvm i 5
+
+test:
+  pre:
+    - npm i
+  post:
+    - npm t
