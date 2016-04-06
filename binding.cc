@@ -292,10 +292,6 @@ NAN_METHOD(tcpsend){
   if (info[2]->IsNumber())
     deadline = now() + To<int64_t>(info[2]).FromJust();
 
-  tcpsock s = UnwrapPointer<tcpsock>(info[0]);
-
-  if ()
-
   size_t sz = tcpsend(UnwrapPointer<tcpsock>(info[0]),
                       node::Buffer::Data(info[1]),
                       node::Buffer::Length(info[1]),
