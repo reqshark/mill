@@ -1,16 +1,15 @@
-const lib       = require('..')
 module.exports  = sodium
 
 function sodium (t) {
   t.test('nbuf', nbuf)
   t.test('socket buffer integrity check', socketbuffers)
+  t.test('print crypto box primitive', box_primitive)
 }
 
 function nbuf (t) {
   t.plan(2)
 
-  var nonce = lib.nstr()
-
+  var nonce = t.lib.nstr()
   t.ok( nonce,   `nonce hex: ${nonce}` );
   t.is( nonce.length,  48, `nonce hex length: ${nonce.length}`   );
 }
@@ -24,8 +23,8 @@ function socketbuffers (t) {
   var sockets   = []
 
   while (i--) {
-    var ipaddr = lib.iplocal(port++)
-    var s = lib.udplisten(ipaddr)
+    var ipaddr = t.lib.iplocal(port++)
+    var s = t.lib.udplisten(ipaddr)
     bufs[ s ] = i
     sockets.push(s)
   }
@@ -33,4 +32,10 @@ function socketbuffers (t) {
   sockets
     .reverse()
     .map( s => t.is( ++i,  bufs[s], `socketbuffer # ${i} == ${bufs[s]}` ) )
+}
+
+function box_primitive (t) {
+  t.plan(1)
+
+  t.ok(t.lib.box_primitive(), `crypto box primitive: ${t.lib.box_primitive()}`)
 }

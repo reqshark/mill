@@ -628,6 +628,7 @@ NAN_MODULE_INIT(Init) {
 
   /* sodium */
   EXPORT_METHOD(target, nstr);
+  EXPORT_METHOD(target, box_primitive);
 }
 
 NODE_MODULE(mill, Init)

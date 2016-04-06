@@ -16,6 +16,7 @@ loop:
 	@node_modules/node-gyp/bin/node-gyp.js rebuild
 
 check:
+	@make build
 	@npm t
 
 test: check

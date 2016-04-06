@@ -17,3 +17,12 @@ NAN_METHOD(nstr){
   char *n = nbuf();
   info.GetReturnValue().Set(New(n).ToLocalChecked());
 }
+
+/* return the crypto_box_primitive */
+NAN_METHOD(box_primitive){
+  const char *box_primitive = crypto_box_primitive();
+
+  info
+    .GetReturnValue()
+    .Set( New( box_primitive ).ToLocalChecked() );
+}
