@@ -34,7 +34,7 @@ const readFile      = require('fs').readFile
     switch (lib) {
       case 'libmill':
         if (process.platform !== 'darwin')
-          s[1] += '\'-lrt\','
+          s[1] += `'-lanl', '-lrt',`
         break
     }
 

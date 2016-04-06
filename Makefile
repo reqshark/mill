@@ -4,8 +4,8 @@ ALL: loop
 
 configure:
 	@git submodule update --init
-	@cd libsodium; ./autogen.sh && ./configure
-	@cd libmill; ./autogen.sh && ./configure
+	@cd libsodium; ./autogen.sh && ./configure --disable-shared
+	@cd libmill; ./autogen.sh && ./configure --disable-shared
 	@node configure
 
 loop:
@@ -16,10 +16,9 @@ loop:
 	@node_modules/node-gyp/bin/node-gyp.js rebuild
 
 check:
-	@npm test
-
-test:
 	@npm t
+
+test: check
 
 clean:
 	@rm -rf lib*.gyp build node_modules
