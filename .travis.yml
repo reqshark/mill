@@ -1,6 +1,6 @@
 sudo: false
 
-language: c
+language: c++
 
 os:
   - osx
@@ -35,7 +35,8 @@ branches:
     - master
 
 before_install:
-  - nvm --version
+  - gcc -v
+  - g++ -v
   - nvm i $v
   - node -v
   - pwd
