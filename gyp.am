@@ -1,0 +1,16 @@
+{
+    'targets': [
+        {
+            'target_name': '{LIB}',
+            'variables': { 'target_arch%': '{ARCH}' },
+            'type': 'static_library',
+            'dependencies': [],
+            'defines': [{DEFINES}],
+            'include_dirs': [{INCLUDES}],
+            'xcode_settings': { 'OTHER_CFLAGS': [{CFLAGS}], },
+            'cflags': [{CFLAGS}],
+            'ldflags': [{LDFLAGS}],
+            'sources': [{SOURCES}],
+        }
+    ]
+}

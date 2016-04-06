@@ -3,9 +3,10 @@
 ALL: loop
 
 configure:
-	git submodule update --init
+	@git submodule update --init
 	@cd libsodium; ./autogen.sh && ./configure
-	@node defines.js
+	@cd libmill; ./autogen.sh && ./configure
+	@node configure
 
 loop:
 	@npm i nan node-gyp
@@ -15,10 +16,10 @@ loop:
 	@node_modules/node-gyp/bin/node-gyp.js rebuild
 
 check:
-	npm test
+	@npm test
 
 test:
-	npm t
+	@npm t
 
 clean:
-	rm -fr build node_modules libsodium.gyp
+	@rm -rf lib*.gyp build node_modules
