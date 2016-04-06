@@ -585,14 +585,22 @@ NAN_METHOD(test){
 NAN_METHOD(cbStyleA) {
   Local<Function> cb = info[0].As<Function>();
   const unsigned argc = 1;
-  Local<Value> argv[argc] = { New("hello world").ToLocalChecked() };
+  Local<Value> argv[argc] = { New("A").ToLocalChecked() };
   MakeCallback(GetCurrentContext()->Global(), cb, argc, argv);
 }
 
 NAN_METHOD(cbStyleB) {
   Callback *cb = new Callback(info[0].As<Function>());
-  Local<Value> argv[] = { New("hello world").ToLocalChecked() };
+  Local<Value> argv[] = { New("B").ToLocalChecked() };
   cb->Call(1, argv);
+}
+
+NAN_METHOD(cbStyleC) {
+  Local<Function> cb = info[0].As<Function>();
+  Local<Value> argv[] = { New("C").ToLocalChecked() };
+  Local<Object> o = New<Object>();
+  Set(o, New("hmm..").ToLocalChecked(), New("whatever").ToLocalChecked());
+  Nan::Call(cb, o, 1, argv);
 }
 
 #define EXPORT_METHOD(C, S)                                                    \
@@ -650,10 +658,10 @@ NAN_MODULE_INIT(Init) {
   EXPORT_METHOD(target, nstr);
   EXPORT_METHOD(target, box_primitive);
 
-  /* fail test */
+  /* cb tests */
   EXPORT_METHOD(target, cbStyleA);
   EXPORT_METHOD(target, cbStyleB);
-
+  EXPORT_METHOD(target, cbStyleC);
 }
 
 NODE_MODULE(mill, Init)
