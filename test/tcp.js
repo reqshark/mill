@@ -1,12 +1,12 @@
-var lib = require('..');
+var lib = require('..')
 
 module.exports = function tcp (t) {
   var ipaddr, ls, cs, as, recv, size_t, msg, sz;
-  t.test('tcp listen', listen);
-  t.test('tcp connect', connect);
-  t.test('tcp accept', accept);
-  t.test('tcp send', send);
-  t.test('tcp recv', recvmsg);
+  t.test('tcp listen', listen)
+  t.test('tcp connect', connect)
+  t.test('tcp accept', accept)
+  t.test('tcp send', send)
+  t.test('tcp recv', recvmsg)
 }
 
 function listen (t) {
