@@ -1,5 +1,5 @@
 # node.js function access to libmill
-[![Build Status](https://travis-ci.org/reqshark/mill.svg?branch=master)](https://travis-ci.org/reqshark/mill)
+[![Build Status](https://circleci.com/gh/reqshark/mill/tree/master.svg?style=svg)](https://circleci.com/gh/reqshark/mill/tree/master)
 
 go style concurrency for node.
 
