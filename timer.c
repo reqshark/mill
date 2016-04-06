@@ -25,12 +25,14 @@
 #include <time.h>
 #include <sys/select.h>
 
-//static struct timeval tv;
-//static unsigned long long milliseconds(){
-//  gettimeofday(&tv, NULL);
-//  return (unsigned long long)(tv.tv_sec) * 1000 +
-//    (unsigned long long)(tv.tv_usec) / 1000;
-//}
+#ifdef __linux__
+static unsigned long long milliseconds(){
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return (unsigned long long)(tv.tv_sec) * 1000 +
+    (unsigned long long)(tv.tv_usec) / 1000;
+}
+#endif
 
 int rsleep (int seconds) {
   int n;

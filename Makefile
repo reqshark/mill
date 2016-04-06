@@ -1,4 +1,4 @@
-.PHONY: clean check test build
+.PHONY: clean check test build t
 
 ALL: loop
 
@@ -26,3 +26,7 @@ build:
 
 clean:
 	@rm -rf lib*.gyp build node_modules
+
+t:
+	@node_modules/node-gyp/bin/node-gyp.js build
+	@node v8

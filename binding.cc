@@ -25,6 +25,18 @@
 
 #include "nan.h"
 
+#include <unistd.h>
+#include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+extern "C" {
+  #include <libmill.h>
+  #include <sodium.h>
+}
+
 using v8::FunctionTemplate;
 using v8::Function;
 using v8::Number;
@@ -45,28 +57,19 @@ using Nan::Set;
 using Nan::New;
 using Nan::To;
 
-extern "C" {
-#include <libmill.h>
-#include <sodium.h>
-}
-
-#include <unistd.h>
-#include <assert.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#define ret info.GetReturnValue().Set
 
 #include "ref.h"
 #include "timer.c"
-
 #include "crypto.h"
+#include "cb.h"
 
-static char ipstr[IPADDR_MAXSTRLEN];
 
 /******************************************************************************/
 /*  IP address library                                                        */
 /******************************************************************************/
+
+static char ipstr[IPADDR_MAXSTRLEN];
 
 #define IPADDR_IPV4 1
 #define IPADDR_IPV6 2
@@ -127,7 +130,7 @@ NAN_METHOD(ipremote){
   /* create a node buffer pointer */
   Local<Object> addr = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(addr), &ipv, sz);
-  info.GetReturnValue().Set(addr);
+  ret(addr);
 }
 
 /******************************************************************************/
@@ -235,13 +238,13 @@ NAN_METHOD(tcplisten){
   /* dereference and pass ipaddr buffer to tcplisten */
   tcpsock ls = tcplisten(*UnwrapPointer<ipaddr*>(info[0]), backlog);
   assert(ls);
-  info.GetReturnValue().Set(WrapPointer(ls, sizeof(tcpsock)));
+  ret(WrapPointer(ls, sizeof(tcpsock)));
 }
 
 NAN_METHOD(tcpport){
   tcpsock s = UnwrapPointer<tcpsock>(info[0]);
   int port = tcpport(s);
-  info.GetReturnValue().Set(New<Number>(port));
+  ret(New<Number>(port));
 }
 
 NAN_METHOD(tcpaccept){
@@ -268,11 +271,11 @@ NAN_METHOD(tcpaccept){
     uv_poll_init_socket(uv_default_loop(), &ctx->poll_handle, ctx->fd);
     uv_poll_start(&ctx->poll_handle, UV_READABLE, tcpAccept);
 
-    info.GetReturnValue().Set(WrapPointer(ctx, sizeof(tcp_t)));
+    ret(WrapPointer(ctx, sizeof(tcp_t)));
   } else {
     tcpsock as = tcpaccept(s, deadline);
     assert(as);
-    info.GetReturnValue().Set(WrapPointer(as, sizeof(&as)));
+    ret(WrapPointer(as, sizeof(&as)));
   }
 }
 
@@ -285,7 +288,7 @@ NAN_METHOD(tcpconnect){
   /* pass an ipremote buffer to tcpconnect */
   tcpsock cs = tcpconnect(*UnwrapPointer<ipaddr*>(info[0]), deadline);
   assert(cs);
-  info.GetReturnValue().Set(WrapPointer(cs, sizeof(tcpsock)));
+  ret(WrapPointer(cs, sizeof(tcpsock)));
 }
 
 NAN_METHOD(tcpsend){
@@ -299,7 +302,7 @@ NAN_METHOD(tcpsend){
                       node::Buffer::Length(info[1]),
                       deadline);
 
-  info.GetReturnValue().Set(New<Number>(sz));
+  ret(New<Number>(sz));
 }
 
 NAN_METHOD(tcpflush){
@@ -325,7 +328,7 @@ NAN_METHOD(tcprecv){
   v8::Local<v8::Object> rc = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(rc), buf, sz);
 
-  info.GetReturnValue().Set(rc);
+  ret(rc);
 }
 
 //TODO: delimiters: const char *delims, size_t delimcount
@@ -347,7 +350,7 @@ NAN_METHOD(tcprecvuntil){
   Local<Value> rc = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(rc), buf, sz);
 
-  info.GetReturnValue().Set(rc);
+  ret(rc);
 }
 
 NAN_METHOD(tcpclose){
@@ -401,12 +404,12 @@ void udpRead(uv_poll_t *req, int status, int events) {
 NAN_METHOD(udplisten){
   udpsock s = udplisten(*UnwrapPointer<ipaddr*>(info[0]));
   assert(s);
-  info.GetReturnValue().Set(WrapPointer(s, sizeof(udpsock)));
+  ret(WrapPointer(s, sizeof(udpsock)));
 }
 
 NAN_METHOD(udpport){
   int port = udpport(UnwrapPointer<udpsock>(info[0]));
-  info.GetReturnValue().Set(New<Number>(port));
+  ret(New<Number>(port));
 }
 
 NAN_METHOD(udpsend){
@@ -434,7 +437,7 @@ NAN_METHOD(udprecv){
     if (context->fd != 0) {
       uv_poll_init_socket(uv_default_loop(), &context->poll_handle, context->fd);
       uv_poll_start(&context->poll_handle, UV_READABLE, udpRead);
-      info.GetReturnValue().Set(WrapPointer(context, 8));
+      ret(WrapPointer(context, 8));
     }
   } else {
     char buf[len];
@@ -454,7 +457,7 @@ NAN_METHOD(udprecv){
     Set(obj, New("buf").ToLocalChecked(), h);
     Set(obj, New("addr").ToLocalChecked(), New<String>(ipstr).ToLocalChecked());
 
-    info.GetReturnValue().Set(obj);
+    ret(obj);
   }
 }
 
@@ -468,8 +471,8 @@ NAN_METHOD(udpclose){
 
 NAN_METHOD (sleep) {
   int timeo = To<int>(info[0]).FromJust();
-  int ret = rsleep( timeo );
-  info.GetReturnValue().Set(ret);
+  int rc = rsleep( timeo );
+  ret(rc);
 }
 
 /******************************************************************************/
@@ -486,7 +489,7 @@ NAN_METHOD(unixlisten){
   unixsock ls = unixlisten(name, 10);
   assert(ls);
 
-  info.GetReturnValue().Set(WrapPointer(ls, sizeof(&ls)));
+  ret(WrapPointer(ls, sizeof(&ls)));
 }
 
 //TODO: deadline
@@ -494,7 +497,7 @@ NAN_METHOD(unixaccept){
   unixsock as = unixaccept(UnwrapPointer<unixsock>(info[0]), -1);
   assert(as);
 
-  info.GetReturnValue().Set(WrapPointer(as, sizeof(&as)));
+  ret(WrapPointer(as, sizeof(&as)));
 }
 
 NAN_METHOD(unixconnect){
@@ -503,7 +506,7 @@ NAN_METHOD(unixconnect){
   unixsock cs = unixconnect(name);
   assert(cs);
 
-  info.GetReturnValue().Set(WrapPointer(cs, sizeof(&cs)));
+  ret(WrapPointer(cs, sizeof(&cs)));
 }
 
 NAN_METHOD(unixpair){
@@ -520,7 +523,7 @@ NAN_METHOD(unixsend){
   size_t sz = unixsend(UnwrapPointer<unixsock>(info[0]),
     node::Buffer::Data(info[1]), node::Buffer::Length(info[1]), -1);
 
-  info.GetReturnValue().Set(New<Number>(sz));
+  ret(New<Number>(sz));
 }
 
 //TODO: deadline
@@ -539,7 +542,7 @@ NAN_METHOD(unixrecv){
   v8::Local<v8::Object> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
 
-  info.GetReturnValue().Set(h);
+  ret(h);
 }
 
 //TODO: deadline
@@ -553,7 +556,7 @@ NAN_METHOD(unixrecvuntil){
   Local<Value> h = NewBuffer(sz).ToLocalChecked();
   memcpy(node::Buffer::Data(h), buf, sz);
 
-  info.GetReturnValue().Set(h);
+  ret(h);
 }
 
 NAN_METHOD(unixclose){
@@ -577,35 +580,10 @@ NAN_METHOD(test){
   msleep(100); return;
 }
 
-//coroutine void callback(Local<Function> cb) {
-//  Local<Value> argv[] = { New("hello world").ToLocalChecked() };
-//  cb->Call(1, argv);
-//}
 
-NAN_METHOD(cbStyleA) {
-  Local<Function> cb = info[0].As<Function>();
-  const unsigned argc = 1;
-  Local<Value> argv[argc] = { New("A").ToLocalChecked() };
-  MakeCallback(GetCurrentContext()->Global(), cb, argc, argv);
-}
 
-NAN_METHOD(cbStyleB) {
-  Callback *cb = new Callback(info[0].As<Function>());
-  Local<Value> argv[] = { New("B").ToLocalChecked() };
-  cb->Call(1, argv);
-}
-
-NAN_METHOD(cbStyleC) {
-  Local<Function> cb = info[0].As<Function>();
-  Local<Value> argv[] = { New("C").ToLocalChecked() };
-  Local<Object> o = New<Object>();
-  Set(o, New("hmm..").ToLocalChecked(), New("whatever").ToLocalChecked());
-  Nan::Call(cb, o, 1, argv);
-}
-
-#define EXPORT_METHOD(C, S)                                                    \
-  Set(C, New(#S).ToLocalChecked(),                                   \
-    Nan::GetFunction(New<FunctionTemplate>(S)).ToLocalChecked());
+#define T(C,S) Set(C, New(#S).ToLocalChecked(),                                \
+  Nan::GetFunction(New<FunctionTemplate>(S)).ToLocalChecked());
 
 NAN_MODULE_INIT(Init) {
   HandleScope scope;
@@ -614,54 +592,54 @@ NAN_MODULE_INIT(Init) {
     abort();
 
   /* ip resolution */
-  EXPORT_METHOD(target, iplocal);
-  EXPORT_METHOD(target, ipremote);
+  T(target, iplocal);
+  T(target, ipremote);
 
   /* tcp library */
-  EXPORT_METHOD(target, tcplisten);
-  EXPORT_METHOD(target, tcpaccept);
-  EXPORT_METHOD(target, tcpconnect);
-  EXPORT_METHOD(target, tcpsend);
-  EXPORT_METHOD(target, tcpflush);
-  EXPORT_METHOD(target, tcprecv);
-  EXPORT_METHOD(target, tcprecvuntil);
-  EXPORT_METHOD(target, tcpport);
-  EXPORT_METHOD(target, tcpclose);
+  T(target, tcplisten);
+  T(target, tcpaccept);
+  T(target, tcpconnect);
+  T(target, tcpsend);
+  T(target, tcpflush);
+  T(target, tcprecv);
+  T(target, tcprecvuntil);
+  T(target, tcpport);
+  T(target, tcpclose);
 
   /* udp library */
-  EXPORT_METHOD(target, udplisten);
-  EXPORT_METHOD(target, udpport);
-  EXPORT_METHOD(target, udpsend);
-  EXPORT_METHOD(target, udprecv);
-  EXPORT_METHOD(target, udpclose);
+  T(target, udplisten);
+  T(target, udpport);
+  T(target, udpsend);
+  T(target, udprecv);
+  T(target, udpclose);
 
   /* extensions */
-  EXPORT_METHOD(target, sleep);
+  T(target, sleep);
 
   /* unix library */
-  EXPORT_METHOD(target, unixlisten);
-  EXPORT_METHOD(target, unixaccept);
-  EXPORT_METHOD(target, unixconnect);
-  EXPORT_METHOD(target, unixpair);
-  EXPORT_METHOD(target, unixsend);
-  EXPORT_METHOD(target, unixflush);
-  EXPORT_METHOD(target, unixrecv);
-  EXPORT_METHOD(target, unixrecvuntil);
-  EXPORT_METHOD(target, unixclose);
+  T(target, unixlisten);
+  T(target, unixaccept);
+  T(target, unixconnect);
+  T(target, unixpair);
+  T(target, unixsend);
+  T(target, unixflush);
+  T(target, unixrecv);
+  T(target, unixrecvuntil);
+  T(target, unixclose);
 
   /* debug */
-  EXPORT_METHOD(target, gotrace);
-  EXPORT_METHOD(target, goredump);
-  EXPORT_METHOD(target, test);
+  T(target, gotrace);
+  T(target, goredump);
+  T(target, test);
 
   /* sodium */
-  EXPORT_METHOD(target, nstr);
-  EXPORT_METHOD(target, box_primitive);
+  T(target, nstr);
+  T(target, box_primitive);
 
   /* cb tests */
-  EXPORT_METHOD(target, cbStyleA);
-  EXPORT_METHOD(target, cbStyleB);
-  EXPORT_METHOD(target, cbStyleC);
+  T(target, cbStyleA);
+  T(target, cbStyleB);
+  T(target, cbStyleC);
 }
 
 NODE_MODULE(mill, Init)

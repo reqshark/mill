@@ -1,5 +1,10 @@
 #define MAX_INPUT_LEN 4096
 
+size_t reinterpret_msg (const char *input, char *cast) {
+  size_t len = strlen(input);
+  memcpy(cast, input, len);
+  return len;
+}
 
 static unsigned char *nonce[crypto_box_NONCEBYTES];
 static char nhex[crypto_box_NONCEBYTES * 2 + 1];
@@ -15,14 +20,16 @@ static char *nbuf() {
 /* return a nonce hex to node */
 NAN_METHOD(nstr){
   char *n = nbuf();
-  info.GetReturnValue().Set(New(n).ToLocalChecked());
+  ret(New(n).ToLocalChecked());
 }
 
 /* return the crypto_box_primitive */
 NAN_METHOD(box_primitive){
   const char *box_primitive = crypto_box_primitive();
 
-  info
-    .GetReturnValue()
-    .Set( New( box_primitive ).ToLocalChecked() );
+  ret(New( box_primitive ).ToLocalChecked());
+}
+
+NAN_METHOD(setkeys){
+
 }
