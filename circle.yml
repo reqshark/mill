@@ -1,6 +1,5 @@
 dependencies:
   pre:
-    - sudo apt-get -y install libtool automake pkg-config autoconf build-essential
     - nvm unload
     - rm -rf ~/.nvm ~/.npm ~/.bower
     - git clone https://github.com/creationix/nvm.git ~/.nvm
