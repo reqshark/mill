@@ -20,8 +20,7 @@ env:
 before_install:
   - rm -rf ~/.nvm ~/.npm && git clone https://github.com/creationix/nvm.git ~/.nvm
   - source ~/.nvm/nvm.sh && nvm install $NODE_V
-  - export CXX=g++-4.9
-  - export CC=gcc-4.9
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CC=gcc-4.9 && export CXX=g++-4.9; fi
 
 install:
   - npm i
