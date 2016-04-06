@@ -1,9 +1,3 @@
 dependencies:
   pre:
     - nvm i 5
-
-test:
-  pre:
-    - npm i
-  post:
-    - npm t
