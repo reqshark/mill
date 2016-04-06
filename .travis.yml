@@ -15,6 +15,9 @@ env:
     - v=4
     - v=5
 
+dist:
+  - trusty
+
 addons:
   apt:
     sources:
