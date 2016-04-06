@@ -1,0 +1,8 @@
+dependencies:
+  pre:
+    - sudo apt-get -y install libtool automake pkg-config autoconf scrot jpegoptim libudev-dev build-essential
+    - nvm unload
+    - rm -rf ~/.nvm ~/.npm ~/.bower
+    - git clone https://github.com/creationix/nvm.git ~/.nvm
+    - source ~/.nvm/nvm.sh
+    - nvm i 5
