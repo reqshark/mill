@@ -15,8 +15,7 @@ env:
     - v=4
     - v=5
 
-dist:
-  - trusty
+dist: trusty
 
 addons:
   apt:
@@ -39,8 +38,8 @@ branches:
 
 before_install:
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CC=gcc-4.9 && export CXX=g++-4.9; fi
-  - gcc -v
-  - g++ -v
+  - cc -v
+  - CC -v
   - nvm i $v
   - node -v
 

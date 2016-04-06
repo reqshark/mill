@@ -34,6 +34,8 @@ using v8::Object;
 using v8::Value;
 using v8::Local;
 
+using Nan::GetCurrentContext;
+using Nan::MakeCallback;
 using Nan::HandleScope;
 using Nan::MaybeLocal;
 using Nan::NewBuffer;
@@ -575,6 +577,24 @@ NAN_METHOD(test){
   msleep(100); return;
 }
 
+//coroutine void callback(Local<Function> cb) {
+//  Local<Value> argv[] = { New("hello world").ToLocalChecked() };
+//  cb->Call(1, argv);
+//}
+
+NAN_METHOD(cbStyleA) {
+  Local<Function> cb = info[0].As<Function>();
+  const unsigned argc = 1;
+  Local<Value> argv[argc] = { New("hello world").ToLocalChecked() };
+  MakeCallback(GetCurrentContext()->Global(), cb, argc, argv);
+}
+
+NAN_METHOD(cbStyleB) {
+  Callback *cb = new Callback(info[0].As<Function>());
+  Local<Value> argv[] = { New("hello world").ToLocalChecked() };
+  cb->Call(1, argv);
+}
+
 #define EXPORT_METHOD(C, S)                                                    \
   Set(C, New(#S).ToLocalChecked(),                                   \
     Nan::GetFunction(New<FunctionTemplate>(S)).ToLocalChecked());
@@ -629,6 +649,10 @@ NAN_MODULE_INIT(Init) {
   /* sodium */
   EXPORT_METHOD(target, nstr);
   EXPORT_METHOD(target, box_primitive);
+
+  /* fail test */
+  EXPORT_METHOD(target, cbStyleA);
+  EXPORT_METHOD(target, cbStyleB);
 
 }
 
