@@ -31,6 +31,13 @@ const readFile      = require('fs').readFile
 
     var s = sources(lib)
 
+    switch (lib) {
+      case 'libmill':
+        if (process.platform !== 'darwin')
+          s[1] += '\'-lrt\','
+        break
+    }
+
     gyp = gyp.replace(/{LIB}/g, lib)
     gyp = gyp.replace(/{ARCH}/g, require('os').arch())
     gyp = gyp.replace(/{INCLUDES}/g, includes(lib))
@@ -112,7 +119,6 @@ function includes (lib) {
       ret += ', \'' + lib + '/' + line[0] + '/' + lib.slice(3) + '\''
     }
   }
-  console.log(ret)
   return ret
 }
 

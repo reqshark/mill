@@ -44,7 +44,8 @@ using Nan::New;
 using Nan::To;
 
 extern "C" {
-#include "libmill.h"
+#include <libmill.h>
+#include <sodium.h>
 }
 
 #include <unistd.h>
