@@ -7,6 +7,7 @@ module.exports = function tcp (t) {
   t.test('tcp accept', accept)
   t.test('tcp send', send)
   t.test('tcp recv', recvmsg)
+  t.test('tcp sendstr', sendstr)
 }
 
 function listen (t) {
@@ -48,6 +49,19 @@ function recvmsg (t) {
   t.plan(1);
   recv = lib.tcprecv(cs, sz);
 
-  t.is(String(recv), String(msg), 'msg: ' + recv);
-  lib.tcpclose(as);
+  t.is(String(recv), String(msg), 'msg: ' + recv)
+}
+
+function sendstr(t){
+  t.plan(1)
+
+  t.lib.box_keypair()
+
+  sz = lib.tcpsendstr(as, 'hello encrypted socket!')
+  lib.tcpflush(as)
+  recv = lib.tcprecv(cs, sz)
+
+  t.is(String(recv).length, sz, 'msg: ' + recv)
+
+  lib.tcpclose(as)
 }
