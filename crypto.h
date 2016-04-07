@@ -1,14 +1,19 @@
 #define MAX_INPUT_LEN 4096
 
+static unsigned char ciphertext[crypto_box_MACBYTES + MAX_INPUT_LEN];
+static unsigned char msg[MAX_INPUT_LEN]; /* reinterpreted msg */
 
 static unsigned char *nonce[crypto_box_NONCEBYTES]; /* nonce      */
+static size_t nsz = crypto_box_NONCEBYTES;
 static char nhex[crypto_box_NONCEBYTES * 2 + 1];    /* nonce hex  */
+
 static unsigned char pk[crypto_box_PUBLICKEYBYTES]; /* public key */
 static unsigned char sk[crypto_box_SECRETKEYBYTES]; /* secret key */
 static char key[crypto_box_PUBLICKEYBYTES * 2 + 1];
 static size_t psz = crypto_box_PUBLICKEYBYTES * 2 + 1;
 static size_t ssz = crypto_box_SECRETKEYBYTES * 2 + 1;
 static size_t ksz = 48;
+static size_t cphr_len;
 
 /*
  * print_hex() is a wrapper around sodium_bin2hex() which allocates
@@ -41,18 +46,19 @@ static char *nbuf() {
   return nhex;
 }
 
-size_t reinterpret_msg (const char *input, char *cast) {
-  size_t len = strlen(input);
+size_t reinterpret_str (const char *input, unsigned char *cast) {
+  //TODO: zero out char cast data
+  unsigned long long len = strlen(input);
   memcpy(cast, input, len);
   return len;
 }
 
-//unsigned long * h2bin (unsigned char *bin, MaybeLocal<String>hex, unsigned long *len) {
-//  sodium_hex2bin( (unsigned char *)&bin, 4096, (char *)hex,
-//                  sizeof hex * 2 + 1, NULL, len, NULL);
-//  return len;
-//}
-//sodium_hex2bin(ppk, MAX_INPUT_LEN, buf, nbytes, NULL, NULL, NULL);
+size_t reinterpret_buf (const char *input, char *cast) {
+  //TODO: zero out char cast data
+  size_t len = strlen(input);
+  memcpy(cast, input, len);
+  return len;
+}
 
 /* return a nonce hex to node */
 NAN_METHOD(nstr){
@@ -98,4 +104,35 @@ NAN_METHOD(getk){
   Set(o, New("sk").ToLocalChecked(), New<String>(key).ToLocalChecked());
 
   ret(o);
+}
+
+
+//api: tcpsendstr(s, str)
+NAN_METHOD(tcpsendstr){
+  unsigned char msg[MAX_INPUT_LEN]; /* reinterpreted msg, try to reuse later */
+  size_t msz;
+
+  //TODO: deadline control
+  int64_t deadline = -1;
+
+  tcpsock s = UnwrapPointer<tcpsock>(info[0]);
+  utf8 str(info[1]);
+
+  unsigned long long len = reinterpret_str(*str, (unsigned char *)msg);
+  randombytes_buf(&nonce, crypto_box_NONCEBYTES);
+  if(crypto_box_easy(ciphertext, msg, len, (unsigned char *)nonce, pk, sk))
+    abort();
+  sodium_bin2hex(nhex, nsz * 2 + 1, (unsigned char *)nonce, nsz);
+
+  cphr_len = crypto_box_MACBYTES + len;
+  msz = sizeof ciphertext * 2 + 1;
+  char msgout[msz];
+  sodium_bin2hex(msgout, msz, ciphertext, cphr_len);
+  size_t sz = sizeof nhex + sizeof msgout + 2;
+
+  char final[sz];
+  snprintf(final, sz, "%s%s%s", nhex, "s", msgout);
+
+  sz = tcpsend(s, final, strlen(final), deadline);
+  ret(New<Number>(sz));
 }

@@ -122,7 +122,7 @@ NAN_METHOD(ipremote){
   int mode = 1;
 
   /* ip address */
-  String::Utf8Value ip(info[0]);
+  utf8 ip(info[0]);
 
   /* get an ipaddr */
   ipaddr ipv = ipremote(*ip, port, mode, deadline);
@@ -638,6 +638,15 @@ NAN_MODULE_INIT(Init) {
   T(target, box_keypair);
   T(target, setk);
   T(target, getk);
+
+  T(target, tcpsendstr);
+  //T(target, tcpsendbuf);
+  //T(target, tcprecvstr);
+  //T(target, tcprecvbuf);
+  //T(target, udpsendstr);
+  //T(target, udpsendbuf);
+  //T(target, udprecvstr);
+  //T(target, udprecvbuf);
 
   /* cb tests */
   T(target, cbStyleA);
