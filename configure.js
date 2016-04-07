@@ -85,7 +85,7 @@ function readMakefile (f, root) {
     while (++read) {
       rd = src[read]
       if (rd) {
-        rd = rd.match(/(\S.*?)\.[c|s|S]/g)
+        rd = rd.match(/(\S.*?)\.[c|S]/g)
         if (rd)
           sources += '\'' + root + '/' + rd + '\','
       } else {
@@ -126,7 +126,7 @@ function cflags (o) {
   return '\'' + o.split('\n')
     .filter(i => /^CFLAGS/.test(i) || /^CPPFLAGS/.test(i) )
     .map(i => i.split("\'")[1].replace(/^\s+/g,''))
-    .filter(i => i)
+    .filter(i => i && i !== '-msse4.1')
     .join('\',\'') + '\''
 }
 

@@ -30,8 +30,8 @@ function getandsetkeys (t) {
   /* now get them back */
   const key = t.lib.getk()
 
-  t.is( key.pk, pk, `public key set: ${key.pk}\npublic key get: ${pk}`)
-  t.is( key.sk, sk, `secret key set: ${key.sk}\npublic key get: ${sk}`)
+  t.is( key.pk, pk, `public key set: ${key.pk} get: ${pk}`)
+  t.is( key.sk, sk, `secret key set: ${key.sk} get: ${sk}`)
 }
 
 function box_keypair (t) {
@@ -42,7 +42,7 @@ function box_keypair (t) {
 
   /* now get them back */
   t.ok( t.lib.getk().pk, `box pair public key: ${t.lib.getk().pk}`)
-  t.ok( t.lib.getk().sk, `box pair public key: ${t.lib.getk().sk}`)
+  t.ok( t.lib.getk().sk, `box pair secret key: ${t.lib.getk().sk}`)
 }
 
 function nbuf (t) {

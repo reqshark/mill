@@ -7,14 +7,14 @@
             "<(module_root_dir)/libsodium.gyp:libsodium",
             "<(module_root_dir)/libmill.gyp:libmill",
         ],
-        'conditions': [ ['OS=="linux"', { 'libraries': [ '-lanl','-lrt' ] }]],
+        'conditions': [ ['OS=="linux"', { 'libraries': [ '-lanl','-lrt','-lpthread' ] }]],
         'include_dirs': [
             'libmill',
             'libsodium/src/libsodium/include',
             "<!(node -e \"require('nan')\")",
         ],
         'xcode_settings': { 'OTHER_CFLAGS': [ '-Wno-unused-function', ], },
-        'cflags': [ '-Wno-unused-function', ],
+        'cflags': [ '-Wno-unused-function', '-fPIC', '-static'],
         'sources': [ 'binding.cc', ],
     }
 ]}

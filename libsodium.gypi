@@ -5,5 +5,10 @@ module.exports =
       '-Wno-type-limits',
       '-Wno-unused-function',
       '-fPIC',
+      '-static'
+    ],
+    'ldflags': [
+      '-Wl,-z,relro',
+      '-Wl,-z,now',
     ],
 }
