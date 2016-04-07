@@ -581,8 +581,6 @@ NAN_METHOD(test){
   msleep(100); return;
 }
 
-
-
 #define T(C,S) Set(C, New(#S).ToLocalChecked(),                                \
   Nan::GetFunction(New<FunctionTemplate>(S)).ToLocalChecked());
 

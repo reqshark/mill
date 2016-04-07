@@ -25,7 +25,7 @@
 #include <time.h>
 #include <sys/select.h>
 
-#ifdef __linux__
+#ifdef __todo__linux__
 static unsigned long long milliseconds(){
   struct timeval tv;
   gettimeofday(&tv, NULL);

@@ -76,17 +76,22 @@ NAN_METHOD(setkeys){
   utf8 kp(info[0]);
   utf8 ks(info[1]);
 
-  sodium_hex2bin((unsigned char *)&pk, 4096, *kp, psz, NULL, NULL, NULL);
-  sodium_hex2bin((unsigned char *)&sk, 4096, *ks, ssz, NULL, NULL, NULL);
+  if (sodium_hex2bin((unsigned char *)&pk, 4096, *kp, psz, NULL, NULL, NULL))
+    abort();
+  if (sodium_hex2bin((unsigned char *)&sk, 4096, *ks, ssz, NULL, NULL, NULL))
+    abort();
 }
 
 NAN_METHOD(getkeys){
   Local<Object> o = New<Object>();
 
-  sodium_bin2hex((char *)&key, ksz * 2 +1, (unsigned char *)pk, sizeof pk);
+  if (!sodium_bin2hex((char *)&key, ksz * 2 +1, (unsigned char *)pk, sizeof pk))
+    abort();
   Set(o, New("pk").ToLocalChecked(), New<String>(key).ToLocalChecked());
 
-  sodium_bin2hex((char *)&key, ksz * 2 +1, (unsigned char *)sk, sizeof sk);
+  if (!sodium_bin2hex((char *)&key, ksz * 2 +1, (unsigned char *)sk, sizeof sk))
+    abort();
   Set(o, New("sk").ToLocalChecked(), New<String>(key).ToLocalChecked());
+
   ret(o);
 }
