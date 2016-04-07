@@ -14,7 +14,7 @@
             "<!(node -e \"require('nan')\")",
         ],
         'xcode_settings': { 'OTHER_CFLAGS': [ '-Wno-unused-function', ], },
-        'cflags': [ '-Wno-unused-function', '-fPIC', '-static'],
+        'cflags': [ '-Wno-unused-variable','-Wno-unused-function', '-fPIC', '-static'],
         'sources': [ 'binding.cc', ],
     }
 ]}
