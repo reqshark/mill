@@ -89,11 +89,11 @@ NAN_METHOD(setk){
 NAN_METHOD(getk){
   Local<Object> o = New<Object>();
 
-  if (!sodium_bin2hex((char *)&key, ksz*2 + 1, (unsigned char *)pk, sizeof pk))
+  if (!sodium_bin2hex((char *)&key, ksz *2 +1, (unsigned char *)pk, sizeof pk))
     abort();
   Set(o, New("pk").ToLocalChecked(), New<String>(key).ToLocalChecked());
 
-  if (!sodium_bin2hex((char *)&key, ksz*2 + 1, (unsigned char *)sk, sizeof sk))
+  if (!sodium_bin2hex((char *)&key, ksz *2 +1, (unsigned char *)sk, sizeof sk))
     abort();
   Set(o, New("sk").ToLocalChecked(), New<String>(key).ToLocalChecked());
 
