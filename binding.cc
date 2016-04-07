@@ -58,6 +58,7 @@ using Nan::New;
 using Nan::To;
 
 #define ret info.GetReturnValue().Set
+#define utf8 String::Utf8Value
 
 #include "ref.h"
 #include "timer.c"
@@ -634,7 +635,10 @@ NAN_MODULE_INIT(Init) {
 
   /* sodium */
   T(target, nstr);
+  T(target, sodium_version);
   T(target, box_primitive);
+  T(target, setkeys);
+  T(target, getkeys);
 
   /* cb tests */
   T(target, cbStyleA);

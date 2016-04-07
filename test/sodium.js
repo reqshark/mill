@@ -1,9 +1,20 @@
 module.exports  = sodium
 
 function sodium (t) {
+  t.test( 'sodium_version', sodium_version)
+  t.test( 'print crypto box primitive', box_primitive )
   t.test( 'nbuf', nbuf )
   t.test( 'socket buffer integrity check', socketbuffers )
-  t.test( 'print crypto box primitive', box_primitive )
+}
+
+function sodium_version (t) {
+  t.plan(1)
+  t.ok(t.lib.sodium_version(), `sodium version: ${t.lib.sodium_version()}`)
+}
+
+function box_primitive (t) {
+  t.plan(1)
+  t.ok(t.lib.box_primitive(), `crypto box primitive: ${t.lib.box_primitive()}`)
 }
 
 function nbuf (t) {
@@ -32,10 +43,4 @@ function socketbuffers (t) {
   sockets
     .reverse()
     .map( s => t.is( ++i,  bufs[s], `socketbuffer # ${i} == ${bufs[s]}` ) )
-}
-
-function box_primitive (t) {
-  t.plan(1)
-
-  t.ok(t.lib.box_primitive(), `crypto box primitive: ${t.lib.box_primitive()}`)
 }
