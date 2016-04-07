@@ -126,7 +126,7 @@ function cflags (o) {
   return '\'' + o.split('\n')
     .filter(i => /^CFLAGS/.test(i) || /^CPPFLAGS/.test(i) )
     .map(i => i.split("\'")[1].replace(/^\s+/g,''))
-    .filter(i => i)//.map(i=> console.log(i))
+    .filter(i => i).map(i=> console.log(i))
     .join('\',\'') + '\''
 }
 
