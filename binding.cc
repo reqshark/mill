@@ -635,8 +635,9 @@ NAN_MODULE_INIT(Init) {
   T(target, nstr);
   T(target, sodium_version);
   T(target, box_primitive);
-  T(target, setkeys);
-  T(target, getkeys);
+  T(target, box_keypair);
+  T(target, setk);
+  T(target, getk);
 
   /* cb tests */
   T(target, cbStyleA);

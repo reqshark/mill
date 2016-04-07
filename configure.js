@@ -85,7 +85,7 @@ function readMakefile (f, root) {
     while (++read) {
       rd = src[read]
       if (rd) {
-        rd = rd.match(/(\S.*?)\.c/g)
+        rd = rd.match(/(\S.*?)\.[c|s|S]/g)
         if (rd)
           sources += '\'' + root + '/' + rd + '\','
       } else {

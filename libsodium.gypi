@@ -6,11 +6,4 @@ module.exports =
       '-Wno-unused-function',
       '-fPIC',
     ],
-    'ldflags': [
-      '-Wl',
-      '-z',
-      'relro',
-      'now',
-      'noexecstack'
-    ],
 }
