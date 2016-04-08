@@ -52,7 +52,7 @@ function recvmsg (t) {
   t.is(String(recv), String(msg), 'msg: ' + recv)
 }
 
-function sendstr(t){
+function sendstr (t) {
   t.plan(1)
 
   t.lib.box_keypair()

@@ -1,11 +1,16 @@
 module.exports =
 {
+    'libraries': [],
     'cflags': [
+      '-std=gnu99',
       '-Wno-unknown-pragmas',
       '-Wno-type-limits',
-      '-Wno-unused-function',
+      '-Wno-sign-compare',
+      '-Wno-missing-field-initializers',
       '-fPIC',
-      '-static'
+      'avx2',
+      '-static',
+      '-Wno-unused',
     ],
     'ldflags': [
       '-Wl,-z,relro',

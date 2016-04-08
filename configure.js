@@ -13,70 +13,112 @@ const readFileSync  = require('fs').readFileSync
 const readdirSync   = require('fs').readdirSync
 const writeFile     = require('fs').writeFile
 const readFile      = require('fs').readFile
-
-ø=[
+const extraflags = [
+  '-Wno-missing-field-initializers',
+  '-Wno-missing-prototypes',
+  '-Wno-unknown-pragmas',
+  '-Wno-unused',
+  '-Qunused-arguments',
+  '-Wno-sign-compare',
+  '-Wno-cast-align',
+  '-Wno-cast-qual',
+]
+const libs          = [
   'libsodium',
-  'libmill'
-].map(lib => {
-  readFile(`${lib}/config.log`, 'utf8', (err, l) => {
-    var f = l.split(/## Output variables. ##/)[1].split(/## confdefs.h. ##/)
+  'libmill',
+].forEach( configure )
 
-    var gyp = readFileSync('gyp.am', 'utf8')
-    var gypi = require(`./${lib}.gypi`)
-    for (var i in gypi) {
-      var I = i.toUpperCase()
-      var reg = new RegExp('\\{'+I+'\\}', 'gi')
-      gyp = gyp.replace( reg, '{'+I+'}'+', \''+ gypi[i].join('\',\'') + '\'' )
-    }
 
-    var s = sources(lib)
+function configure ( lib ) {
+  var gypi = require(`${__dirname}/${lib}.gypi`)
 
-    switch (lib) {
-      case 'libmill':
-        if (process.platform !== 'darwin')
-          s[1] += `'-lanl', '-lrt',`
-        break
-    }
+  const f = readFileSync( `${__dirname}/${lib}/config.log`, 'utf8' )
+    .split(/## Output variables. ##/)[1]
+    .split(/## confdefs.h. ##/)
 
-    gyp = gyp.replace(/{LIB}/g, lib)
-    gyp = gyp.replace(/{ARCH}/g, require('os').arch())
-    gyp = gyp.replace(/{INCLUDES}/g, includes(lib))
-    gyp = gyp.replace(/{LDFLAGS}/g, ldflags(f[0]))
-    gyp = gyp.replace(/{SOURCES}/g, s[0] )
-    gyp = gyp.replace(/{CFLAGS}/g, (s[1] ? s[1] : '') + cflags(f[0]) )
-    gyp = gyp.replace(/{DEFINES}/g, defs(f[1]))
+  /* read sources and flags from Makefile.am */
+  var makefile = msources(lib)
 
-    writeFile (`${lib}.gyp`, gyp )
-  })
-})
+  /* combine cflags from config.log */
+  var flags = compilerflags(f[0], makefile.cc, gypi.ldflags, lib)
 
-function sources (o) {
-  var src = readdirSync(o), dir = {}
-  if (src.filter(i => i === 'src').length) {
-    dir.path = `${o}/src`
-    src = readdirSync(dir.path)
-  } else {
-    dir.path = o
-  }
-  dir.src = src
-  return make(dir)
+  /* build gyp */
+  var gyp = readFileSync(`${__dirname}/gyp.am`, 'utf8')
+    .replace(/{LIB}/g,        lib)
+    .replace(/{ARCH}/g,       require('os').arch())
+    .replace(/{LIBRARIES}/g,  JSON.stringify(gypi.libraries))
+    .replace(/{DEFINES}/g,    defs(f[1]))
+    .replace(/{INCLUDES}/g,   includes(lib))
+    .replace(/{CFLAGS}/g,     JSON.stringify(flags.cc))
+    .replace(/{CPPFLAGS}/g,   JSON.stringify(flags.cpp))
+    .replace(/{LDFLAGS}/g,    JSON.stringify(flags.ld))
+    .replace(/{SOURCES}/g,    makefile.sources)
+
+  writeFile ( `${__dirname}/${lib}.gyp` , gyp )
 }
 
-function make (dir) {
+function libgypi (lib) {
+  for (var i in gypi) {
+    var I = i.toUpperCase()
+    gyp = gyp.replace( new RegExp('\\{'+I+'\\}', 'gi'),
+      '{'+I+'}'+', \''+ gypi[i].join('\',\'') + '\'' )
+  }
+  return gyp
+}
+
+function defs (o) {
+  return '\'' + o.split('\n')
+    .filter(i => /define/.test(i))
+    .map(i => i.slice(8).split(/\s/g).join('='))
+    .filter(i => i)
+    .join('\',\'') + '\''
+}
+
+function includes (lib) {
+  const f = readFileSync(`${lib}/configure.ac`, 'utf8')
+    .split(/AC_CONFIG_FILES/)
+
+  var ret = `'${lib}'`
+
+  // try to find an include directory in configure.ac
+  if (f.length-1) {
+    var line = f[1].match(/(\S.*?)include/gm)
+    if (line) {
+      ret += `,'${lib}/${line[0]}'`
+
+      // this one is a bit unexpected, so should probably check if dir exists
+      ret += `,'${lib}/${line[0]}/${lib.slice(3)}'`
+    }
+  }
+  return ret
+}
+
+function msources (o) {
+  const dir = {
+    src   : readdirSync (`${__dirname}/${o}`),
+    path  : `${o}`,
+  }
+  if (dir.src.filter(i => i === 'src').length) {
+    dir.path = `${o}/src`
+    dir.src = readdirSync ( dir.path )
+  }
+  return makeam ( dir )
+}
+
+function makeam (dir) {
   if (dir.src.filter(i => i === 'Makefile.am').length) {
     var file = readFileSync(`${dir.path}/Makefile.am`, 'utf8')
-    var subdirs = file.match(/SUBDIRS/)
-    if (subdirs) {
+    if (file.match(/SUBDIRS/)) {
       var f = file.match(/\S+$/gm)
       f.shift()
       dir.path += `/${f}`
       file = readFileSync(`${dir.path}/Makefile.am`, 'utf8')
     }
-    return readMakefile(file, dir.path)
+    return readam(file, dir.path)
   }
 }
 
-function readMakefile (f, root) {
+function readam (f, root) {
   var read = 0, sources = '', cflags = '', rd, s
   var srcs = f.split(/la_SOURCES/)
   while (srcs.length - 1) {
@@ -106,42 +148,52 @@ function readMakefile (f, root) {
       read = -1
     }
   }
-  return [sources, cflags]
-}
-
-function includes (lib) {
-  var ret = '\'' + lib + '\''
-  var f = readFileSync(`${lib}/configure.ac`, 'utf8').split(/AC_CONFIG_FILES/)
-  if (f.length-1) {
-    var line = f[1].match(/(\S.*?)include/gm)
-    if (line) {
-      ret += `,'${lib}/${line[0]}'`
-      ret += `,'${lib}/${line[0]}/${lib.slice(3)}'`
-    }
+  return {
+    sources : sources,
+    cc      : cflags.split(/[.',]/).filter(i=>i)
   }
+}
+
+function compilerflags (o, flags, ld, l) {
+  var ret = { cc:[], cpp:[], ld: ld}
+
+  o.match(/(FLAGS).*\i?\n?/g).join('')
+    .replace(/^\w+=\'/gm,'')
+    .replace(/\'|-version-info|19:0:1|-g/g,'')
+    .split(/\n|\t/g)
+    .map(i => {
+      if (i.length)
+        i.split(/^\s+/g).filter(j=> j).map(k=> ret.cc.push(k))
+    })
+
+  o.match(/(LDFLAGS).*\i?\n?/g).join('')
+    .replace(/^\w+=\'/gm,'')
+    .replace(/\'||\\'/g,'')
+    .split(/\n|\t/g)
+    .map(i => {
+      if (i.length)
+        i.split(/\s+/g).filter(j=> j).map(k=> ret.ld.push(k))
+    })
+
+  try {
+    ret.cpp = flags.pop().split(/ /)
+  } catch ($) {
+    ret.cc = (Object.keys(ret.cc.reduce( (cc, el, i) => {
+      el = el.split(' ')
+
+      while (el.length) {
+        var e = el.pop()
+        if(/D/.test(e)) {
+          ret.cpp.push(e)
+        } else {
+          cc[e] = e.length
+        }
+      }
+
+      return cc
+    }, {})))
+  }
+
+  ret.cc = ret.cc.concat(flags)
   return ret
-}
-
-function cflags (o) {
-  return '\'' + o.split('\n')
-    .filter(i => /^CFLAGS/.test(i) || /^CPPFLAGS/.test(i) )
-    .map(i => i.split("\'")[1].replace(/^\s+/g,''))
-    .filter(i => i).map(i=> console.log(i))
-    .join('\',\'') + '\''
-}
-
-function ldflags (o) {
-  return '\'' + o.split('\n')
-    .filter(i => /^LDFLAGS/.test(i))
-    .map(i => i.split("\'")[1].replace(/^\s+/g,''))
-    .filter(i => i)
-    .join('\',\'') + '\''
-}
-
-function defs (o) {
-  return '\'' + o.split('\n')
-    .filter(i => /define/.test(i))
-    .map(i => i.slice(8).split(/\s/g).join('='))
-    .filter(i => i)
-    .join('\',\'') + '\''
 }

@@ -13,8 +13,20 @@
             'libsodium/src/libsodium/include',
             "<!(node -e \"require('nan')\")",
         ],
-        'xcode_settings': { 'OTHER_CFLAGS': [ '-Wno-unused-function', ], },
-        'cflags': [ '-Wno-unused-variable','-Wno-unused-function', '-fPIC', '-static'],
+        'xcode_settings': { 'OTHER_CFLAGS': [
+            '-Wno-unused-function',
+            '-Wno-unused-variable',
+            '-Wno-missing-prototypes',
+            '-Wno-format',
+        ], },
+        'cflags': [
+            '-Wno-unused-variable',
+            '-Wno-unused-function',
+            '-fPIC',
+            '-static'
+            '-Wno-missing-prototypes',
+            '-Wno-format',
+        ],
         'sources': [ 'binding.cc', ],
     }
 ]}
