@@ -136,3 +136,22 @@ NAN_METHOD(tcpsendstr){
   sz = tcpsend(s, final, strlen(final), deadline);
   ret(New<Number>(sz));
 }
+
+NAN_METHOD(tcptest){
+  char buf[TCP_BUFLEN];
+
+  printf("%lu\n%lu\n", sizeof buf, TCP_BUFLEN);
+}
+
+
+NAN_METHOD(tcprecvsecret){
+  unsigned char msg[MAX_INPUT_LEN];
+  size_t msz;
+
+  int64_t deadline = -1;
+  tcpsock s = UnwrapPointer<tcpsock>(info[0]);
+  utf8 str(info[1]);
+
+  char buf[TCP_BUFLEN];
+  size_t nbytes = tcprecv(s, buf, sizeof buf, -1);
+}

@@ -62,7 +62,6 @@ using Nan::To;
 
 #include "ref.h"
 #include "timer.c"
-#include "crypto.h"
 #include "cb.h"
 
 
@@ -581,6 +580,8 @@ NAN_METHOD(test){
   msleep(100); return;
 }
 
+#include "crypto.h"
+
 #define T(C,S) Set(C, New(#S).ToLocalChecked(),                                \
   Nan::GetFunction(New<FunctionTemplate>(S)).ToLocalChecked());
 
@@ -640,6 +641,8 @@ NAN_MODULE_INIT(Init) {
   T(target, getk);
 
   T(target, tcpsendstr);
+  T(target, tcprecvsecret);
+  T(target, tcptest);
   //T(target, tcpsendbuf);
   //T(target, tcprecvstr);
   //T(target, tcprecvbuf);
