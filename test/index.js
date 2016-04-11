@@ -1,4 +1,6 @@
-require ('tape')('============== mill testsuite summary ==============', tests)
+const tape = require ('tape')
+
+tape('============== mill testsuite summary ==============', tests)
 
 function tests (t) {
   t.test('===== callbacks ==========', require('./callbacks'))
@@ -9,4 +11,4 @@ function tests (t) {
   t.test('===== sodium library =====', require('./sodium'))
 }
 
-require ('tape').Test.prototype.lib = require('..')
+tape.Test.prototype.lib = require('..')

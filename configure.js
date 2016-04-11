@@ -155,7 +155,7 @@ function readam (f, root) {
 }
 
 function compilerflags (o, flags, gypi, l) {
-  var ret = { cc: gypi.cflags, cpp:[], ld: gypi.ldflags}
+  var ret = { cc: [], cpp:[], ld: gypi.ldflags}
 
   o.match(/(FLAGS).*\i?\n?/g).join('')
     .replace(/^\w+=\'/gm,'')
@@ -194,6 +194,6 @@ function compilerflags (o, flags, gypi, l) {
     }, {})))
   }
 
-  ret.cc = ret.cc.concat(flags)
+  ret.cc = ret.cc.concat(flags, gypi.cflags)
   return ret
 }
