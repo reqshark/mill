@@ -24,7 +24,6 @@
             '-Wno-unused-function',
             '-fPIC',
             '-static',
-            '-Wno-missing-prototypes',
             '-Wno-format',
         ],
         'sources': [ 'binding.cc', ],

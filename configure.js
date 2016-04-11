@@ -40,7 +40,7 @@ function configure ( lib ) {
   var makefile = msources(lib)
 
   /* combine cflags from config.log */
-  var flags = compilerflags(f[0], makefile.cc, gypi.ldflags, lib)
+  var flags = compilerflags(f[0], makefile.cc, gypi, lib)
 
   /* build gyp */
   var gyp = readFileSync(`${__dirname}/gyp.am`, 'utf8')
@@ -154,8 +154,8 @@ function readam (f, root) {
   }
 }
 
-function compilerflags (o, flags, ld, l) {
-  var ret = { cc:[], cpp:[], ld: ld}
+function compilerflags (o, flags, gypi, l) {
+  var ret = { cc: gypi.cflags, cpp:[], ld: gypi.ldflags}
 
   o.match(/(FLAGS).*\i?\n?/g).join('')
     .replace(/^\w+=\'/gm,'')
