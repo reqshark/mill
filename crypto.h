@@ -1,7 +1,7 @@
 #define MAX_INPUT_LEN 4096
 
 static unsigned char ciphertext[crypto_box_MACBYTES + MAX_INPUT_LEN];
-static unsigned char msg[MAX_INPUT_LEN]; /* reinterpreted msg */
+//static unsigned char msg[MAX_INPUT_LEN]; /* reinterpreted msg */
 
 static unsigned char *nonce[crypto_box_NONCEBYTES]; /* nonce      */
 static size_t nsz = crypto_box_NONCEBYTES;
