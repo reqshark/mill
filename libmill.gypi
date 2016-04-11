@@ -6,7 +6,6 @@ module.exports = {
   '-Wno-unused',
   '-Wno-sign-compare',
   '-Wno-missing-field-initializers',
-  '-Wno-missing-field-initializers',
 ],
 'ldflags': [
   '-lanl',

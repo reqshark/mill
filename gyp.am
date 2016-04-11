@@ -7,9 +7,9 @@
             'dependencies': [],
             'conditions': [[
                 'OS=="linux"', {
-                    'libraries': [
+                    'libraries': 
                         {LIBRARIES}
-                    ],
+                    ,
                     'ldflags':
                         {LDFLAGS}
                     ,
@@ -27,7 +27,7 @@
                 'OTHER_CPLUSPLUSFLAGS':
                     {CPPFLAGS}
                 ,
-                'GCC_C_LANGUAGE_STANDARD': 'gnu99',
+                'GCC_C_LANGUAGE_STANDARD': 'gnu99'
             },
             'cflags':
                 {CFLAGS}

@@ -23,3 +23,4 @@
 */
 
 module.exports = require('./build/Release/mill.node')
+module.exports.box_keypair()

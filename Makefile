@@ -25,7 +25,7 @@ build:
 	@node_modules/node-gyp/bin/node-gyp.js build
 
 clean:
-	@rm -rf lib*.gyp build node_modules
+	@rm -rf lib*.gyp build node_modules npm-debug.log
 
 t:
 	@node_modules/node-gyp/bin/node-gyp.js build

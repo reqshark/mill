@@ -23,7 +23,7 @@
             '-Wno-unused-variable',
             '-Wno-unused-function',
             '-fPIC',
-            '-static'
+            '-static',
             '-Wno-missing-prototypes',
             '-Wno-format',
         ],
