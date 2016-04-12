@@ -21,7 +21,6 @@ const extraflags = [
   '-Qunused-arguments',
   '-Wno-sign-compare',
   '-Wno-cast-align',
-  '-Wno-cast-qual',
 ]
 const libs          = [
   'libsodium',
@@ -194,8 +193,10 @@ function compilerflags (o, flags, gypi, l) {
     }, {})))
   }
 
-  ret.cc = process.platform === 'darwin'
-    ? ret.cc.concat(flags, gypi.cflags) : ret.cc = gypi.cflags
+  //ret.cc = process.platform === 'darwin'
+    //? ret.cc.concat(flags, gypi.cflags) : ret.cc = gypi.cflags
+
+  ret.cc = ret.cc.concat(flags, gypi.cflags)
 
   return ret
 }

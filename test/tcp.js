@@ -59,7 +59,7 @@ function sendstr (t) {
   t.lib.tcpflush(as)
   recv = t.lib.tcprecv(cs, sz)
 
-  t.is(String(recv).length, sz, 'msg: ' + recv)
+  t.is(recv.length, sz, `msg sz: ${sz} msg: ${recv}`)
 
   t.lib.tcpclose(as)
 }

@@ -144,7 +144,7 @@ NAN_METHOD(tcpsendstr){
   char final[sz];
   snprintf(final, sz, "%s%s%s", nhex, "s", msgout);
 
-  sz = tcpsend(s, final, sz, deadline);
+  sz = tcpsend(s, final, strlen(final), deadline);
   ret(New<Number>(sz));
 }
 
@@ -162,8 +162,8 @@ NAN_METHOD(tcprecvsecret){
   chop(buf, 0, 49);
   sodium_hex2bin((unsigned char *)&ciphertext, 4096, buf, sizeof buf, NULL, &msz, NULL);
 
-  unsigned char msgrecv[msz];
-  crypto_box_open_easy(msgrecv, ciphertext, msz, nonce, pk, sk);
+  char msgrecv[(sz-49)/2 - 1];
+  crypto_box_open_easy((unsigned char *)&msgrecv, ciphertext, msz, nonce, pk, sk);
 
-  ret(New<String>((char*)msgrecv).ToLocalChecked());
+  ret(New<String>(msgrecv).ToLocalChecked());
 }
