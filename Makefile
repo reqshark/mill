@@ -1,18 +1,26 @@
-.PHONY: clean check test build t
+.PHONY: install clean check test build t
 
-ALL: loop
+LIB=$(shell pwd)/opt
+libmill=$(LIB)/lib/libmill.a
+sodium=$(LIB)/lib/libsodium.a
+includes=-I$(LIB)/include -std=gnu99
+args=--enable-shared --prefix=$(LIB)
+build=./autogen.sh && ./configure $(args) && make -j 8 && make install &&\
+make distclean
 
-configure:
+#ifeq ($(shell uname -s), Darwin)
+#  flags=$(libmill) $(sodium) $(includes)
+#else
+#  flags=$(sodium) $(libmill) -lanl -lrt -lpthread $(includes) -fvisibility=hidden -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -D_GNU_SOURCE -O3
+#endif
+
+
+ALL: install
+
+install:
 	@git submodule update --init
-	@cd libsodium; ./autogen.sh && ./configure --disable-shared
-	@cd libmill; ./autogen.sh && ./configure --disable-shared
-	@node configure
-
-loop:
-	@npm i nan node-gyp
-    ifeq (,$(wildcard libmill.gyp))
-	@make configure
-    endif
+	@if [ ! -s $(libmill) ]; then cd libmill && $(build); fi
+	@if [ ! -s $(sodium) ]; then cd libsodium && $(build); fi
 	@node_modules/node-gyp/bin/node-gyp.js rebuild
 
 check:
@@ -25,7 +33,7 @@ build:
 	@node_modules/node-gyp/bin/node-gyp.js build
 
 clean:
-	@rm -rf lib*.gyp build node_modules npm-debug.log
+	@rm -rf lib*.gyp build node_modules opt npm-debug.log
 
 t:
 	@node_modules/node-gyp/bin/node-gyp.js build

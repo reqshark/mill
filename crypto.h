@@ -139,12 +139,12 @@ NAN_METHOD(tcpsendstr){
   msz = sizeof ciphertext * 2 + 1;
   char msgout[msz];
   sodium_bin2hex(msgout, msz, ciphertext, cphr_len);
-  size_t sz = sizeof nhex + sizeof msgout + 1;
+  size_t sz = strlen(nhex) + strlen(msgout) + 1;
 
   char final[sz];
   snprintf(final, sz, "%s%s%s", nhex, "s", msgout);
 
-  sz = tcpsend(s, final, strlen(final), deadline);
+  sz = tcpsend(s, final, sz, deadline);
   ret(New<Number>(sz));
 }
 
