@@ -3,7 +3,7 @@
 static unsigned char ciphertext[crypto_box_MACBYTES + MAX_INPUT_LEN];
 static unsigned char msg[MAX_INPUT_LEN]; /* reinterpreted msg */
 
-static unsigned char *nonce[crypto_box_NONCEBYTES]; /* nonce      */
+static unsigned char nonce[crypto_box_NONCEBYTES]; /* nonce      */
 static size_t nsz = crypto_box_NONCEBYTES;
 static char nhex[crypto_box_NONCEBYTES * 2 + 1];    /* nonce hex  */
 
@@ -57,6 +57,16 @@ size_t reinterpret_buf (const char *input, char *cast) {
   //TODO: zero out char cast data
   size_t len = strlen(input);
   memcpy(cast, input, len);
+  return len;
+}
+
+int chop(char *str, int begin, int len) {
+  int l = strlen(str);
+
+  if (len < 0) len = l - begin;
+  if (begin + len > l) len = l - begin;
+  memmove(str + begin, str + begin + len, l - len + 1);
+
   return len;
 }
 
@@ -120,6 +130,7 @@ NAN_METHOD(tcpsendstr){
 
   unsigned long long len = reinterpret_str(*str, (unsigned char *)msg);
   randombytes_buf(&nonce, crypto_box_NONCEBYTES);
+
   if(crypto_box_easy(ciphertext, msg, len, (unsigned char *)nonce, pk, sk))
     abort();
   sodium_bin2hex(nhex, nsz * 2 + 1, (unsigned char *)nonce, nsz);
@@ -128,11 +139,31 @@ NAN_METHOD(tcpsendstr){
   msz = sizeof ciphertext * 2 + 1;
   char msgout[msz];
   sodium_bin2hex(msgout, msz, ciphertext, cphr_len);
-  size_t sz = sizeof nhex + sizeof msgout + 2;
+  size_t sz = sizeof nhex + sizeof msgout + 1;
 
   char final[sz];
   snprintf(final, sz, "%s%s%s", nhex, "s", msgout);
 
-  sz = tcpsend(s, final, strlen(final), deadline);
+  sz = tcpsend(s, final, sz, deadline);
   ret(New<Number>(sz));
+}
+
+NAN_METHOD(tcprecvsecret){
+  size_t msz;
+
+  int bsz = To<int>(info[1]).FromJust();
+  char buf[bsz];
+  size_t sz = tcprecv(UnwrapPointer<tcpsock>(info[0]), buf, bsz, -1);
+  buf[sz] = '\0';
+
+  strncpy(nhex, buf, 48);
+  sodium_hex2bin((unsigned char *)&nonce, 4096, nhex, nsz, NULL, NULL, NULL);
+
+  chop(buf, 0, 49);
+  sodium_hex2bin((unsigned char *)&ciphertext, 4096, buf, sizeof buf, NULL, &msz, NULL);
+
+  unsigned char msgrecv[msz];
+  crypto_box_open_easy(msgrecv, ciphertext, msz, nonce, pk, sk);
+
+  ret(New<String>((char*)msgrecv).ToLocalChecked());
 }

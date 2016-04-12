@@ -194,7 +194,8 @@ function compilerflags (o, flags, gypi, l) {
     }, {})))
   }
 
-  //ret.cc = ret.cc.concat(flags, gypi.cflags)
-  ret.cc = gypi.cflags
+  ret.cc = process.platform === 'darwin'
+    ? ret.cc.concat(flags, gypi.cflags) : ret.cc = gypi.cflags
+
   return ret
 }

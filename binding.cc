@@ -641,7 +641,7 @@ NAN_MODULE_INIT(Init) {
   T(target, getk);
 
   T(target, tcpsendstr);
-  //T(target, tcprecvsecret);
+  T(target, tcprecvsecret);
   //T(target, tcptest);
   //T(target, tcpsendbuf);
   //T(target, tcprecvstr);
