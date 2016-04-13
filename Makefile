@@ -1,4 +1,4 @@
-.PHONY: install clean check test build t
+.PHONY: install update clean check test build t
 
 LIB=$(shell pwd)/opt
 libmill=$(LIB)/lib/libmill.a
@@ -19,10 +19,12 @@ ALL: install
 
 install:
 	@npm i nan node-gyp
-	@git submodule update --init
 	@if [ ! -s $(libmill) ]; then cd libmill && $(build); fi
 	@if [ ! -s $(sodium) ]; then cd libsodium && $(build); fi
 	@node_modules/node-gyp/bin/node-gyp.js rebuild
+
+update:
+	git submodule update --init
 
 check:
 	@make build
