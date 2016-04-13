@@ -6,7 +6,8 @@ go style concurrency for node.
 an experiment
 
 ```bash
-$ npm i libmill
+#$ npm i libmill
+npm install is broken at the moment, use git to install
 
 # or
 $ git clone https://github.com/reqshark/mill.git && cd mill

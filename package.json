@@ -1,6 +1,6 @@
 {
   "name":             "libmill",
-  "version":          "0.3.3",
+  "version":          "0.3.5",
   "description":      "bindings to libmill",
   "dependencies":     {
     "nan":              "2",

@@ -7,12 +7,6 @@ includes=-I$(LIB)/include -std=gnu99
 args=--enable-shared --prefix=$(LIB)
 build=./autogen.sh && ./configure $(args) && make -j 8 && make install
 
-#ifeq ($(shell uname -s), Darwin)
-#  flags=$(libmill) $(sodium) $(includes)
-#else
-#  flags=$(sodium) $(libmill) -lanl -lrt -lpthread $(includes) -fvisibility=hidden -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -D_GNU_SOURCE -O3
-#endif
-
 
 ALL: install
 
