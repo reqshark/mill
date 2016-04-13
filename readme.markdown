@@ -6,18 +6,16 @@ go style concurrency for node.
 an experiment
 
 ```bash
-#$ npm i libmill
-npm install is broken at the moment, use git to install
+#install libmill and libsodium dependencies
+$ git clone https://github.com/sustrik/libmill.git
+$ cd libmill && ./autogen.sh && ./configure && make -j 8 && sudo make install
+$ sudo /sbin/ldconfig # linux only
 
-# or
-$ git clone https://github.com/reqshark/mill.git && cd mill
+$ git clone https://github.com/jedisct1/libsodium.git
+$ cd libsodium && ./autogen.sh && ./configure && make -j 8 && sudo make install
+$ sudo /sbin/ldconfig # linux only
+
 $ npm i && npm t
-
-# blow away the build, node_modules and lib*.gyp with:
-$ make clean
-
-# run `node-gyp build` to recompile just a change to the source
-$ make build
 ```
 
 # tcp library

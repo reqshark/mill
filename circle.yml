@@ -1,3 +1,7 @@
 dependencies:
   pre:
     - nvm i 5
+    - git clone https://github.com/sustrik/libmill.git
+    - git clone https://github.com/jedisct1/libsodium.git
+    - cd libmill && ./autogen.sh && ./configure && make -j 8 && sudo make install && sudo /sbin/ldconfig
+    - cd libsodium && ./autogen.sh && ./configure && make -j 8 && sudo make install && sudo /sbin/ldconfig

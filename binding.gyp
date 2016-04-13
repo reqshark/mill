@@ -3,13 +3,15 @@
         {
             'target_name': 'mill',
             'libraries': [
-                '<!@(pkg-config <(module_root_dir)/opt/lib/pkgconfig/libmill.pc --libs)',
-                '<!@(pkg-config <(module_root_dir)/opt/lib/pkgconfig/libsodium.pc --libs)',
+                '<!@(pkg-config libmill --libs)',
+                '<!@(pkg-config libsodium --libs)',
             ],
             'include_dirs': [
                 "<!(node -e \"require('nan')\")",
-                'opt/include',
-                'opt/include/sodium',
+                '/usr/local/include',
+                '/opt/local/include',
+                '<!@(pkg-config libmill --cflags-only-I)',
+                '<!@(pkg-config libsodium --cflags-only-I)',
             ],
             'xcode_settings': {
                 'OTHER_CFLAGS': [
@@ -25,9 +27,6 @@
                 '-Wno-unused-function',
                 '-Wno-format',
                 '-O3',
-            ],
-            'ldflags':[
-                '-Wl,-rpath -Wl,<(module_root_dir)/opt/lib',
             ],
             'sources': [
                 'binding.cc'

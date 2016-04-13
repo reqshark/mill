@@ -1,6 +1,0 @@
-[submodule "libmill"]
-	path = libmill
-	url = https://github.com/sustrik/libmill
-[submodule "libsodium"]
-	path = libsodium
-	url = https://github.com/jedisct1/libsodium
