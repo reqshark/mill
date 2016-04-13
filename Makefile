@@ -18,6 +18,7 @@ make distclean
 ALL: install
 
 install:
+	@npm i nan node-gyp
 	@git submodule update --init
 	@if [ ! -s $(libmill) ]; then cd libmill && $(build); fi
 	@if [ ! -s $(sodium) ]; then cd libsodium && $(build); fi
