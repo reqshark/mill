@@ -87,7 +87,7 @@ process.stdout.write('udp socket listening on port: ' + lib.udpport(ls) + '\n');
    otherwise w/out a cb, it will block and udprecv's return value is your msg */
 
 
-/* the non-blocking way (a for async) */
+/* the non-blocking way (passing the optional callback) */
 lib.udprecv(ls, 255, function (msg) {
   var buf = String(msg.buf) /* msg.buf is a node buffer of the packet body */
   var addr = msg.addr  /* string address of packet origin */
