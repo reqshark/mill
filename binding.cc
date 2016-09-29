@@ -63,10 +63,6 @@ static char ipstr[IPADDR_MAXSTRLEN];
 /*  IP address library                                                        */
 /******************************************************************************/
 
-#define IPADDR_IPV4 1
-#define IPADDR_IPV6 2
-#define IPADDR_PREF_IPV4 3
-#define IPADDR_PREF_IPV6 4
 
 NAN_METHOD(iplocal){
   /* default port */
