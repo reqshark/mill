@@ -6,22 +6,6 @@ os:
   - osx
   - linux
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - gcc-4.8
-      - g++-4.8
-
-env:
-  - NODE_V="node"
-
-before_install:
-  - rm -rf ~/.nvm ~/.npm && git clone https://github.com/creationix/nvm.git ~/.nvm
-  - source ~/.nvm/nvm.sh && nvm install $NODE_V
-  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CC=gcc-4.8 && export CXX=g++-4.8; fi
-
 install:
   - npm i
 
