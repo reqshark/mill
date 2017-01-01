@@ -2,15 +2,39 @@ sudo: false
 
 language: c
 
+branches:
+  except:
+    - gh-pages
+
 os:
   - osx
   - linux
 
+compiler:
+  - gcc
+  - clang
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.9
+      - clang
+
+before_install:
+  - export configures = "--prefix=`pwd`/opt --disable-shared --enable-debug --enable-valgrind --disable-threads"
+  - git clone --depth 1 https://github.com/sustrik/libdill
+  - git clone --depth 1 https://github.com/sustrik/dsock
+  - cd libdill && ./autogen.sh
+  - ./configure $configures
+  - make
+
 install:
-  - npm i
+  - cd libdill && make install
 
 script:
-  - npm t
+  - cd libdill && make check
 
 notifications:
   email: false
