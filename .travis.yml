@@ -33,7 +33,7 @@ before_install:
   - make
   - make install && cd ../dsock && ./autogen.sh
   - ./configure $configures
-  - make
+  - make CFLAGS=-I`pwd`/opt/include LDFLAGS=-L`pwd`/opt/lib
 
 install:
   - make install
