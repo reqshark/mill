@@ -23,7 +23,7 @@ addons:
       - clang
 
 before_install:
-  - export configures = "--prefix=`pwd`/opt --disable-shared --enable-debug --enable-valgrind --disable-threads"
+  - export configures="--prefix=`pwd`/opt --disable-shared --enable-debug --enable-valgrind --disable-threads"
   - git clone --depth 1 https://github.com/sustrik/libdill
   - git clone --depth 1 https://github.com/sustrik/dsock
   - cd libdill && ./autogen.sh
