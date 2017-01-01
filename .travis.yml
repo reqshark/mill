@@ -3,6 +3,7 @@ sudo: false
 language: c
 
 branches:
+# only: master
   except:
     - gh-pages
 
@@ -21,11 +22,14 @@ addons:
     packages:
       - gcc-4.9
       - clang
+      #- libssl-dev
+      #- openssl
 
 before_install:
-  - export configures="--prefix=`pwd`/opt --disable-shared --enable-debug --enable-valgrind --disable-threads"
+  - [ `type -P brew` ] && brew update || ``
   - git clone --depth 1 https://github.com/sustrik/libdill
   - git clone --depth 1 https://github.com/sustrik/dsock
+  - export configures="--prefix=`pwd`/opt --disable-shared --enable-debug --disable-threads"
   - cd libdill && ./autogen.sh
   - ./configure $configures
   - make
@@ -38,3 +42,6 @@ script:
 
 notifications:
   email: false
+
+#- wget http://valgrind.org/downloads/valgrind-3.12.0.tar.bz2
+#- tar xf valgrind-3.12.0.tar.bz2 && cd valgrind-3.12.0.tar.bz2
