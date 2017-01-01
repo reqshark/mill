@@ -3,7 +3,6 @@ sudo: false
 language: c
 
 branches:
-# only: master
   except:
     - gh-pages
 
@@ -26,7 +25,7 @@ addons:
       #- openssl
 
 before_install:
-  - [ `type -P brew` ] && brew update || ``
+  - '[ `type -P brew` ] && brew update || ``'
   - git clone --depth 1 https://github.com/sustrik/libdill
   - git clone --depth 1 https://github.com/sustrik/dsock
   - export configures="--prefix=`pwd`/opt --disable-shared --enable-debug --disable-threads"
