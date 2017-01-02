@@ -28,12 +28,14 @@ before_install:
   - '[ `type -P brew` ] && brew update || ``'
   - eval "git clone --depth 1 https://github.com/sustrik/"{libdill,dsock}";"
   - export configures="--prefix=`pwd`/opt --disable-shared --enable-debug --disable-threads"
+  - export PKG_CONFIG_PATH=`pwd`/opt/lib/pkgconfig && export LD_RUN_PATH=`pwd`/opt/lib && export LD_LIBRARY_PATH=`pwd`/opt/lib
+  - export CFLAGS=-I`pwd`/opt/include && export LDFLAGS=-L`pwd`/opt/lib
   - cd libdill && ./autogen.sh
   - ./configure $configures
   - make
   - make install && cd ../dsock && ./autogen.sh
   - ./configure $configures
-  - make CFLAGS=-I`pwd`/opt/include LDFLAGS=-L`pwd`/opt/lib
+  - make
 
 install:
   - make install
