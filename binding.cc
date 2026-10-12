@@ -43,6 +43,9 @@ using Nan::Set;
 using Nan::New;
 using Nan::To;
 
+/* The receive buffers below live on the stack, so cap what callers may ask for. */
+#define MAX_RECV_BUF (1024 * 1024)
+
 extern "C" {
 #include "libmill.h"
 }
@@ -301,12 +304,16 @@ NAN_METHOD(tcpflush){
 }
 
 NAN_METHOD(tcprecv){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   /* deadline */
   int64_t deadline = -1;
   if (info[2]->IsNumber())
     deadline = now() + To<int64_t>(info[2]).FromJust();
 
   int rcvbuf = To<int>(info[1]).FromJust();
+  if (rcvbuf <= 0 || rcvbuf > MAX_RECV_BUF)
+    return Nan::ThrowRangeError("receive buffer size must be between 1 and 1048576");
 
   char buf[rcvbuf];
   size_t sz = tcprecv(UnwrapPointer<tcpsock>(info[0]), buf, rcvbuf, deadline);
@@ -319,6 +326,8 @@ NAN_METHOD(tcprecv){
 
 //TODO: delimiters: const char *delims, size_t delimcount
 NAN_METHOD(tcprecvuntil){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   /* deadline */
   int64_t deadline = -1;
   if (info[2]->IsNumber())
@@ -326,6 +335,9 @@ NAN_METHOD(tcprecvuntil){
 
   /* recv buffer size */
   int rcvbuf = To<int>(info[1]).FromJust();
+  if (rcvbuf <= 0 || rcvbuf > MAX_RECV_BUF)
+    return Nan::ThrowRangeError("receive buffer size must be between 1 and 1048576");
+  
   char buf[rcvbuf];
 
   /* recvuntil delimiters */
@@ -405,8 +417,12 @@ NAN_METHOD(udpsend){
 }
 
 NAN_METHOD(udprecv){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   ipaddr addr;
   int len = To<int>(info[1]).FromJust();
+  if (len <= 0 || len > MAX_RECV_BUF)
+    return Nan::ThrowRangeError("receive buffer size must be between 1 and 1048576");
   udpsock s = UnwrapPointer<udpsock>(info[0]);
 
   if (info[2]->IsFunction()) {
@@ -519,6 +535,8 @@ NAN_METHOD(unixflush){
 
 //TODO: deadline
 NAN_METHOD(unixrecv){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   int rcvbuf = To<int>(info[1]).FromJust();
 
   /* should make it a static char */
@@ -533,6 +551,8 @@ NAN_METHOD(unixrecv){
 
 //TODO: deadline
 NAN_METHOD(unixrecvuntil){
+  if (!node::Buffer::HasInstance(info[0]))
+    return Nan::ThrowTypeError("the socket argument must be a socket handle");
   int rcvbuf = To<int>(info[1]).FromJust();
   unixsock s = UnwrapPointer<unixsock>(info[0]);
 
